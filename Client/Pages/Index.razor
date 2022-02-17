@@ -1,0 +1,124 @@
+﻿@page "/"
+@using Data.Model
+@using Services
+@using Data
+@inject WSOSService _WSOSService
+@inject NavigationManager UriHelper
+
+<h1>WSOS skill training</h1>
+<MudDivider />
+
+<MudGrid Class="pt-4">
+    <MudItem md="3" Class="d-flex min-vh-100">
+        <MudTreeView @bind-SelectedValue="SelectedValue" ServerData="_WSOSService.LoadSubskillsData" Items="treeItems" CanHover="true">
+            <ItemTemplate>
+                <MudTreeViewItem Value="@context" Text="@context.ViewName" />
+            </ItemTemplate>
+        </MudTreeView>
+        <MudDivider Vertical="true" FlexItem="true" />
+    </MudItem>
+
+    <MudItem md="9">
+
+        @if (SelectedSubskill != null)
+        {
+            <div class="d-flex justify-content-between align-items-center">
+                <h3>@SelectedSubskill.Name</h3>
+
+                @if (SelectedSubskill.Importance != null)
+                {
+                    <div class="d-flex flex-column align-items-center">
+                        <h6 @*class="font-weight-normal" *@>Importance</h6>
+
+                        <MudRating SelectedValue="@SelectedSubskill.Importance.Value" Size="Size.Medium" ReadOnly="true" />
+                    </div>
+
+                }
+            </div>
+            <div class="pl-1">
+                <div>
+                    <h4>Theory</h4>
+                    <MudPaper Style="@($"background:{ Colors.BlueGrey.Lighten4 }")" Class="pt-1 pl-2 pr-2">
+                        
+                        <MudMarkdown Value="@SelectedSubskill.Theory" />
+                    </MudPaper>
+                </div>
+                <div>
+                    <h4>Tasks</h4>
+                    <MudTable Items="@SelectedSubskill.SubSkillTasks" Hover="true" OnRowClick="RowClickEvent" T="SubSkillTask">
+                        <HeaderContent>
+                            <MudTh>Name</MudTh>
+                            <MudTh>Author</MudTh>
+                            <MudTh>MaxScore</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Name">@context.Name</MudTd>
+                            <MudTd DataLabel="Author">@context.Author.Login</MudTd>
+                            <MudTd DataLabel="MaxScore">@context.MaxScore</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </div>
+
+            </div>
+
+
+        }
+
+    </MudItem>
+</MudGrid>
+
+
+
+
+
+
+@code {
+
+    private TreeItem? selectedValue;
+
+    public TreeItem? SelectedValue
+    {
+        get { return selectedValue; }
+        set
+        {
+            if (value != null)
+            {
+                selectedValue = value;
+
+                InvokeAsync(async () => { SelectedSubskill = await _WSOSService.LoadSubSkillFromTreeItem(value); });
+
+            }
+        }
+    }
+
+    private SubSkill? selectedSubskill;
+
+    public SubSkill? SelectedSubskill
+    {
+        get { return selectedSubskill; }
+        set
+        {
+            selectedSubskill = value;
+            StateHasChanged();
+        }
+    }
+
+
+    private HashSet<TreeItem>
+    treeItems
+    { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        treeItems = await Task.Run(() => _WSOSService.GetAllWSOSAsync());
+    }
+
+    private void RowClickEvent(TableRowClickEventArgs<SubSkillTask> tableRowClickEventArgs)
+    {
+        UriHelper.NavigateTo("tasks/" + tableRowClickEventArgs.Item.Id);
+    }
+
+
+
+
+}

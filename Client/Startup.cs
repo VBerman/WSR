@@ -13,6 +13,10 @@ using System.Threading.Tasks;
 using MudBlazor.Services;
 using Client.Data.Model;
 using Client.Services;
+using Microsoft.AspNetCore.Components.Authorization;
+using Client.Providers;
+using System.Net.Http;
+using Blazored.LocalStorage;
 
 namespace Client
 {
@@ -32,10 +36,27 @@ namespace Client
             services.AddMudServices();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+     
+            
+
+            //auth
+            services.AddBlazoredLocalStorage();
+            services.AddAuthorizationCore();
+            services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+            services.AddScoped<IAuthService, AuthService>();
+            //services
             services.AddScoped<WSOSService>();
             services.AddScoped<TaskService>();
-            services.AddDbContext<DB>(); 
+            services.AddDbContext<DB>();
+
+            // server auth
+            services.AddAuthentication(JwtBearerDefaults);
+
+            services.AddSingleton(sp => new HttpClient
+            {
+                BaseAddress = new Uri(Configuration.GetValue<string>("ApiUrl:DefaultApi"))
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

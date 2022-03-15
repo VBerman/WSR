@@ -1,21 +1,33 @@
 ﻿@inherits LayoutComponentBase
+<AuthorizeView>
 
-<div class="page">
-    
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    <Authorized>
+        <div class="page">
 
-    <div class="main">
-        <div class="top-row px-4">
-            <MudLink Href="https://docs.microsoft.com/aspnet/" Underline="Underline.None">About</MudLink>
+            <div class="sidebar">
+                <NavMenu />
+            </div>
+
+            <div class="main">
+                <div class="top-row px-4">
+                    <LoginDisplay />
+                </div>
+
+                <div class="content px-4">
+                    @Body
+                </div>
+            </div>
+
         </div>
-
-        <div class="content px-4">
-            @Body
+    </Authorized>
+    <NotAuthorized>
+        <div class="main">
+            <div class="content px-4">
+                @Body
+            </div>
         </div>
-    </div>
-</div>
+    </NotAuthorized>
+</AuthorizeView>
 <MudThemeProvider IsDarkMode=false />
 <MudDialogProvider />
 <MudSnackbarProvider />

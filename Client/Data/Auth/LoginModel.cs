@@ -9,10 +9,12 @@ namespace Client.Data.Auth
     public class LoginModel
     {
         [Required(ErrorMessage = "Email required")]
+        [EmailAddress]
         public string Login { get; set; }
 
         [Required(ErrorMessage = "Password required")]
         public string Password { get; set; }
+
     }
 
 

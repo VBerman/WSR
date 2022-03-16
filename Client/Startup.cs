@@ -72,6 +72,8 @@ namespace Client
             {
                 BaseAddress = new Uri(Configuration.GetValue<string>("ApiUrl:DefaultApi"))
             });
+
+            services.AddControllersWithViews();
             
         }
 

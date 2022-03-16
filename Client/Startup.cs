@@ -17,6 +17,9 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Client.Providers;
 using System.Net.Http;
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Client
 {
@@ -36,8 +39,8 @@ namespace Client
             services.AddMudServices();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-     
-            
+
+
 
             //auth
             services.AddBlazoredLocalStorage();
@@ -50,13 +53,26 @@ namespace Client
             services.AddDbContext<DB>();
 
             // server auth
-            services.AddAuthentication(JwtBearerDefaults);
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["JWT:Issuer"],
+                        ValidAudience = Configuration["JWT:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]))
+                    };
+                });
 
             services.AddSingleton(sp => new HttpClient
             {
                 BaseAddress = new Uri(Configuration.GetValue<string>("ApiUrl:DefaultApi"))
             });
-
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,14 +89,17 @@ namespace Client
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
+            app.UseAuthorization();
+            
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapBlazorHub();
+                endpoints.MapRazorPages();
+                endpoints.MapControllers();
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

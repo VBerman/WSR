@@ -1,33 +1,37 @@
 ﻿@inherits LayoutComponentBase
-<AuthorizeView>
+<Microsoft.AspNetCore.Components.Authorization.CascadingAuthenticationState>
 
-    <Authorized>
-        <div class="page">
 
-            <div class="sidebar">
-                <NavMenu />
-            </div>
+    <AuthorizeView>
 
-            <div class="main">
-                <div class="top-row px-4">
-                    <LoginDisplay />
+        <Authorized>
+            <div class="page">
+
+                <div class="sidebar">
+                    <NavMenu />
                 </div>
 
+                <div class="main">
+                    <div class="top-row px-4">
+                        <LoginDisplay />
+                    </div>
+
+                    <div class="content px-4">
+                        @Body
+                    </div>
+                </div>
+
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <div class="main">
                 <div class="content px-4">
                     @Body
                 </div>
             </div>
-
-        </div>
-    </Authorized>
-    <NotAuthorized>
-        <div class="main">
-            <div class="content px-4">
-                @Body
-            </div>
-        </div>
-    </NotAuthorized>
-</AuthorizeView>
+        </NotAuthorized>
+    </AuthorizeView>
+</Microsoft.AspNetCore.Components.Authorization.CascadingAuthenticationState>
 <MudThemeProvider IsDarkMode=false />
 <MudDialogProvider />
 <MudSnackbarProvider />

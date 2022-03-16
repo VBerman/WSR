@@ -100,7 +100,7 @@ namespace Client
             
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                endpoints.MapBlazorHub();
                 endpoints.MapControllers();
                 endpoints.MapFallbackToPage("/_Host");
             });

@@ -15,7 +15,7 @@
                 <MudText Typo="Typo.h3" Class="mb-7">Please sign in</MudText>
             </div>
 
-            <MudTextField Variant="Variant.Outlined" @bind-Value="loginModel.Login" For="@(() => loginModel.Login)" InputType="InputType.Email" InputMode="InputMode.email" Label="Email"></MudTextField>
+            <MudTextField Variant="Variant.Outlined" @bind-Value="loginModel.Login" For="@(() => loginModel.Login)"  Label="Login"></MudTextField>
             <MudTextField Variant="Variant.Outlined" @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" InputType="InputType.Password" Label="Password"></MudTextField>
             <MudCheckBox @bind-Checked="@isRemember" Label="Remember me"></MudCheckBox>
             <MudButton Color="Color.Primary" ButtonType="ButtonType.Submit" Variant="Variant.Filled" FullWidth="true">Sign in</MudButton>

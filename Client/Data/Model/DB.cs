@@ -349,7 +349,7 @@ namespace Client.Data.Model
             {
                 entity.ToTable("SubSkillTaskResolving");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                
 
                 entity.Property(e => e.EndTime).HasColumnType("datetime");
 

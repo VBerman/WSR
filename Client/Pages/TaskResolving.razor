@@ -1,0 +1,20 @@
+﻿
+@page "/resolvingtasks/{resolvingTaskId:int}"
+@using Services
+@using Data.Model
+@inject TaskService TaskService
+
+
+
+
+<p>@ResolvingTaskId</p>
+
+
+@code {
+    [Parameter] public int ResolvingTaskId { get; set; }
+
+   
+
+}
+
+

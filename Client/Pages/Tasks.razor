@@ -61,22 +61,25 @@
                         </MudField>
 
                     </MudItem>
-                    <MudItem md="12">
-                        <MudCheckBox @bind-Checked="@IsFullResolving" Disabled="@(TaskResolving != null)" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Small" Color="Color.Primary"></MudCheckBox>
-                    </MudItem>
+                    <AuthorizeView Roles="Competitor">
+                        @*add exclude role*@
 
-                    <MudItem md="12" Class="d-flex justify-content-between">
-                        <MudBlazor.MudButton OnClick="StartResolving" Color="Color.Primary" Disabled="@(TaskResolving != null)" Variant="Variant.Filled">Start resolving</MudBlazor.MudButton>
-                        <MudBlazor.MudButton OnClick="EndResolving" Color="Color.Primary" Disabled="@(TaskResolving == null)" Variant="Variant.Filled">End resolving</MudBlazor.MudButton>
-                    </MudItem>
-                    @if (TaskResolving != null)
-                    {
-                        <MudItem md="12" Class="d-flex align-center justify-center mud-width-full">
-
-                            <MudLink Href="@($"resolvingTasks/" + TaskResolving.Id.ToString())" Color="Color.Primary">View resolving</MudLink>
+                        <MudItem md="12">
+                            <MudCheckBox @bind-Checked="@IsFullResolving" Disabled="@(TaskResolving != null)" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Small" Color="Color.Primary"></MudCheckBox>
                         </MudItem>
-                    }
 
+                        <MudItem md="12" Class="d-flex justify-content-between">
+                            <MudBlazor.MudButton OnClick="StartResolving" Color="Color.Primary" Disabled="@(TaskResolving != null)" Variant="Variant.Filled">Start resolving</MudBlazor.MudButton>
+                            <MudBlazor.MudButton OnClick="EndResolving" Color="Color.Primary" Disabled="@(TaskResolving == null)" Variant="Variant.Filled">End resolving</MudBlazor.MudButton>
+                        </MudItem>
+                        @if (TaskResolving != null)
+                        {
+                            <MudItem md="12" Class="d-flex align-center justify-center mud-width-full">
+
+                                <MudLink Href="@($"resolvingTasks/" + TaskResolving.Id.ToString())" Color="Color.Primary">View resolving</MudLink>
+                            </MudItem>
+                        }
+                    </AuthorizeView>    
                 </MudGrid>
 
 

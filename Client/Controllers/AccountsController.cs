@@ -33,7 +33,7 @@ namespace Client.Controllers
      
         public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
-            var user = await _DB.Users.AsAsyncEnumerable().FirstOrDefaultAsync(u => u.Login == loginModel.Login);
+            var user = await _DB.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).AsAsyncEnumerable().FirstOrDefaultAsync(u => u.Login == loginModel.Login);
 
             if (user == null || user.Password != loginModel.Password.ToMD5Hash())
             {

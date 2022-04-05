@@ -38,7 +38,7 @@ namespace Client.Services
             await _localStorage.SetItemAsync("authToken", loginResult.Token);
             ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(login.Login);
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult.Token);
-
+            
             return loginResult;
         }
 

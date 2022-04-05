@@ -85,18 +85,18 @@
                 }
             </MudGrid>
         </MudItem>
-        <MudDivider Vertical="true" />
+        
 
         @if (ResolvingTask.Comment != null)
         {
             <MudItem md="4">
                 <div class="pt-3 pl-3">
-                    <MudField Label="Comment" Variant="Variant.Text">
+                        <MudText>Comment</MudText>
                         <MudPaper Style="@($"background:{ Colors.BlueGrey.Lighten5 }")" Class="mt-4 pa-3">
 
                             <MudMarkdown Value="@ResolvingTask.Comment" />
                         </MudPaper>
-                    </MudField>
+                    
                 </div>
             </MudItem>
         }

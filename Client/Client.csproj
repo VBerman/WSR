@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>f486d7ec-80ad-4d25-ac95-f985223d9879</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +22,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
-    <PackageReference Include="MudBlazor" Version="5.2.4" />
+    <PackageReference Include="MudBlazor" Version="5.1.5" />
     <PackageReference Include="MudBlazor.Markdown" Version="0.0.5" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.Linq.Async" Version="5.1.0" />
@@ -30,6 +31,12 @@
   <ItemGroup>
     <Folder Include="Data\ModelPartial\" />
     <Folder Include="Pages\Participant\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Pages\_Host.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

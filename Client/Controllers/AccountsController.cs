@@ -42,9 +42,7 @@ namespace Client.Controllers
             var claims = new List<Claim>
             {
                 new Claim("Id", user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Login),
-                new Claim(ClaimTypes.Email, user.Email)
-
+                new Claim(ClaimTypes.Name, user.Login)
             };
             foreach (var role in user.UserRoles)
             {

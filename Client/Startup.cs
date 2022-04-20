@@ -20,6 +20,7 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace Client
 {
@@ -36,9 +37,9 @@ namespace Client
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMudServices();
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddMudServices();
 
 
 
@@ -50,7 +51,9 @@ namespace Client
             //services
             services.AddScoped<WSOSService>();
             services.AddScoped<TaskService>();
-            services.AddDbContext<DB>();
+            services.AddDbContext<DB>(options => 
+                options.UseSqlServer(Configuration.GetConnectionString("PublicServer"))
+            );
 
             // server auth
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -78,7 +81,7 @@ namespace Client
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DB db)
         {
             if (env.IsDevelopment())
             {
@@ -88,8 +91,10 @@ namespace Client
             {
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+              
             }
+
+            db.Database.EnsureCreated();
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();

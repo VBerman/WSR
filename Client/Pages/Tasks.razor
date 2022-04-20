@@ -12,7 +12,7 @@
         <MudDivider></MudDivider>
         <MudGrid>
             <MudItem md="9">
-                <MudTabPanel Text="Information" >
+                <MudTabPanel Text="Information">
                     <div class="pt-3 pl-3">
                         <h3>Description</h3>
                         <MudPaper Style="@($"background:{ Colors.BlueGrey.Lighten4 }")" Class="mt-4 pa-3">
@@ -31,8 +31,8 @@
 
                 <MudTabPanel Text="Comments">
                     <div class="pt-3 pl-3">-->
-                        @*<h3>Comments</h3>*@
-                    <!--</div>
+                @*<h3>Comments</h3>*@
+                <!--</div>
                 </MudTabPanel>-->
             </MudItem>
             <MudItem md="3" Class="d-flex min-vh-100 mt-4">
@@ -57,21 +57,32 @@
                     </MudItem>
                     <MudItem md="12">
                         <MudField Label="SubSkill" ReadOnly="true" Variant="Variant.Text">
-                            <MudText Href="#">@SubSkillTask.SubSkill.Name</MudText>
+                            <MudText>@SubSkillTask.SubSkill.Name</MudText>
                         </MudField>
 
                     </MudItem>
-                    <MudItem md="12">
-                        <MudCheckBox @bind-Checked="@IsFullResolving" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Small" Color="Color.Primary"></MudCheckBox>
-                    </MudItem>
+                    <AuthorizeView Roles="Competitor">
+                        @*add exclude role*@
 
-                    <MudItem md="12" Class="d-flex justify-content-between">
-                        <MudBlazor.MudButton Color="Color.Primary" Variant="Variant.Filled">Start resolving</MudBlazor.MudButton>
-                        <MudBlazor.MudButton Color="Color.Primary" Variant="Variant.Filled">End resolving</MudBlazor.MudButton>
-                    </MudItem>
+                        <MudItem md="12">
+                            <MudCheckBox @bind-Checked="@IsFullResolving" Disabled="@(TaskResolving != null)" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Small" Color="Color.Primary"></MudCheckBox>
+                        </MudItem>
+
+                        <MudItem md="12" Class="d-flex justify-content-between">
+                            <MudBlazor.MudButton OnClick="StartResolving" Color="Color.Primary" Disabled="@(TaskResolving != null)" Variant="Variant.Filled">Start resolving</MudBlazor.MudButton>
+                            <MudBlazor.MudButton OnClick="EndResolving" Color="Color.Primary" Disabled="@(TaskResolving == null)" Variant="Variant.Filled">End resolving</MudBlazor.MudButton>
+                        </MudItem>
+                        @if (TaskResolving != null)
+                        {
+                            <MudItem md="12" Class="d-flex align-center justify-center mud-width-full">
+
+                                <MudLink Href="@($"resolvingTasks/" + TaskResolving.Id.ToString())" Color="Color.Primary">View resolving</MudLink>
+                            </MudItem>
+                        }
+                    </AuthorizeView>    
                 </MudGrid>
-                
-               
+
+
             </MudItem>
         </MudGrid>
 
@@ -88,13 +99,30 @@ else
 
 @code {
     [Parameter] public int TaskId { get; set; }
-
+    public SubSkillTaskResolving? TaskResolving { get; set; }
     public bool IsFullResolving { get; set; }
     public SubSkillTask? SubSkillTask { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         SubSkillTask = await Task.Run(() => TaskService.GetSubSkillTask(TaskId));
+        TaskResolving = await Task.Run(() => TaskService.CurrentResolvingTask(SubSkillTask));
+        if (TaskResolving != null)
+        {
+            IsFullResolving = TaskResolving.IsFullResolving;
+        }
+    }
+
+    private async Task StartResolving()
+    {
+        TaskResolving = await Task.Run(() => TaskService.StartTask(SubSkillTask, IsFullResolving));
+    }
+
+    private async Task EndResolving()
+    {
+        await Task.Run(() => TaskService.EndTask(TaskResolving));
+        TaskResolving = null;
+        
     }
 
 }

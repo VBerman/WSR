@@ -1,0 +1,52 @@
+﻿
+@page "/login"
+@inject Services.IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider ApiAuthenticationStateProvider
+
+@attribute [AllowAnonymous]
+
+<div class="d-flex align-items-center justify-content-center ">
+    <MudPaper Elevation="0" Width="400px">
+        <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" Class="d-flex flex-column">
+            <DataAnnotationsValidator />
+
+            <div class="d-flex flex-column  align-items-center justify-content-center ">
+                <img src="/images/logo.png" class="mb-14" width="300px" />
+
+                <MudText Typo="Typo.h3" Class="mb-7">Please sign in</MudText>
+            </div>
+
+            <MudTextField Variant="Variant.Outlined" @bind-Value="loginModel.Login" For="@(() => loginModel.Login)"  Label="Login"></MudTextField>
+            <MudTextField Variant="Variant.Outlined" @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" InputType="InputType.Password" Label="Password"></MudTextField>
+            <MudCheckBox @bind-Checked="@isRemember" Label="Remember me"></MudCheckBox>
+            <MudButton Color="Color.Primary" ButtonType="ButtonType.Submit" Variant="Variant.Filled" FullWidth="true">Sign in</MudButton>
+
+        </EditForm>
+
+
+    </MudPaper>
+</div>
+
+@code {
+
+    private Data.Auth.LoginModel loginModel { get; set; } = new Data.Auth.LoginModel();
+    private bool isRemember { get; set; }
+    private bool isShowErrors { get; set; }
+
+
+
+    private async Task HandleLogin(EditContext context)
+    {
+
+        isShowErrors = false;
+        var result = await AuthService.Login(loginModel);
+        
+        if (result.Successful)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+
+    }
+
+}

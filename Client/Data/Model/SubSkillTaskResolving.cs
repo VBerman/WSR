@@ -13,7 +13,7 @@ namespace Client.Data.Model
         public TimeSpan? ResolvingDuration { get; set; }
         public byte? Score { get; set; }
         public string SolutionPath { get; set; }
-        public DateTime EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
         public DateTime StartTime { get; set; }
         public string Comment { get; set; }
         public bool IsFullResolving { get; set; }

@@ -3,6 +3,7 @@
 @using Services
 @using Data.Model
 @inject TaskService TaskService
+@inject TaskResolvingService TaskResolvingService
 
 
 
@@ -118,14 +119,14 @@ else
     protected override async Task OnInitializedAsync()
     {
 
-        ResolvingTask = await Task.Run(() => TaskService.GetResolvingTask(ResolvingTaskId));
+        ResolvingTask = await Task.Run(() => TaskResolvingService.GetResolvingTask(ResolvingTaskId));
 
 
     }
 
     private async Task EndResolving()
     {
-        ResolvingTask = await Task.Run(() => TaskService.EndTask(ResolvingTask));
+        ResolvingTask = await Task.Run(() => TaskResolvingService.EndTask(ResolvingTask));
 
 
     }

@@ -15,38 +15,38 @@ namespace Client.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly HttpClient _httpClient;
-        private readonly AuthenticationStateProvider _authenticationStateProvider;
-        private readonly ILocalStorageService _localStorage;
+        private readonly HttpClient httpClient;
+        private readonly AuthenticationStateProvider authenticationStateProvider;
+        private readonly ILocalStorageService localStorage;
 
         public AuthService(HttpClient httpClient, AuthenticationStateProvider authenticationStateProvider, ILocalStorageService localStorage)
         {
-            _httpClient = httpClient;
-            _authenticationStateProvider = authenticationStateProvider;
-            _localStorage = localStorage;
+            this.httpClient = httpClient;
+            this.authenticationStateProvider = authenticationStateProvider;
+            this.localStorage = localStorage;
         }
         public async Task<LoginResult> Login(LoginModel login)
         {
             var loginAsJson = JsonSerializer.Serialize(login);
-            var response = await _httpClient.PostAsync("api/Login", new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
+            var response = await httpClient.PostAsync("api/Login", new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
             var loginResult = JsonSerializer.Deserialize<LoginResult>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             if (!response.IsSuccessStatusCode)
             {
                 return loginResult;
             }
 
-            await _localStorage.SetItemAsync("authToken", loginResult.Token);
-            ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(login.Login);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult.Token);
+            await localStorage.SetItemAsync("authToken", loginResult.Token);
+            ((ApiAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(login.Login);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult.Token);
             
             return loginResult;
         }
 
         public async Task Logout()
         {
-            await _localStorage.RemoveItemAsync("authToken");
-            ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
-            _httpClient.DefaultRequestHeaders.Authorization = null;
+            await localStorage.RemoveItemAsync("authToken");
+            ((ApiAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
+            httpClient.DefaultRequestHeaders.Authorization = null;
         }
     }
 }

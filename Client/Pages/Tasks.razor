@@ -2,6 +2,7 @@
 @using Services
 @using Data.Model
 @inject TaskService TaskService
+@inject TaskResolvingService TaskResolvingService
 
 @if (SubSkillTask != null)
 {
@@ -106,7 +107,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         SubSkillTask = await Task.Run(() => TaskService.GetSubSkillTask(TaskId));
-        TaskResolving = await Task.Run(() => TaskService.CurrentResolvingTask(SubSkillTask));
+        TaskResolving = await Task.Run(() => TaskResolvingService.CurrentResolvingTask(SubSkillTask));
         if (TaskResolving != null)
         {
             IsFullResolving = TaskResolving.IsFullResolving;
@@ -115,12 +116,12 @@ else
 
     private async Task StartResolving()
     {
-        TaskResolving = await Task.Run(() => TaskService.StartTask(SubSkillTask, IsFullResolving));
+        TaskResolving = await Task.Run(() => TaskResolvingService.StartTask(SubSkillTask, IsFullResolving));
     }
 
     private async Task EndResolving()
     {
-        await Task.Run(() => TaskService.EndTask(TaskResolving));
+        await Task.Run(() => TaskResolvingService.EndTask(TaskResolving));
         TaskResolving = null;
         
     }

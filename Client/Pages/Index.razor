@@ -5,13 +5,14 @@
 @using Data
 @inject WSOSService _WSOSService
 @inject NavigationManager UriHelper
+@inject SubSkillService SubSkillService 
 
 <h1>WSOS skill training</h1>
 <MudDivider />
 
 <MudGrid Class="pt-4">
     <MudItem md="3" Class="d-flex min-vh-100">
-        <MudTreeView @bind-SelectedValue="SelectedValue" ServerData="_WSOSService.LoadSubskillsData" Items="treeItems" CanHover="true">
+        <MudTreeView @bind-SelectedValue="SelectedValue" ServerData="SubSkillService.LoadSubskillsData" Items="TreeItems" CanHover="true">
             <ItemTemplate>
                 <MudTreeViewItem Value="@context" Text="@context.ViewName" />
             </ItemTemplate>
@@ -86,7 +87,7 @@
             {
                 selectedValue = value;
 
-                InvokeAsync(async () => { SelectedSubskill = await _WSOSService.LoadSubSkillFromTreeItem(value); });
+                InvokeAsync(async () => { SelectedSubskill = await SubSkillService.LoadSubSkillFromTreeItem(value); });
 
             }
         }
@@ -105,21 +106,17 @@
     }
 
 
-    private HashSet<TreeItem>
-    treeItems
-    { get; set; }
+    public HashSet<TreeItem> TreeItems { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        treeItems = await Task.Run(() => _WSOSService.GetAllWSOSAsync());
+        TreeItems = await Task.Run(() => _WSOSService.GetAllWSOSAsync());
     }
 
     private void RowClickEvent(TableRowClickEventArgs<SubSkillTask> tableRowClickEventArgs)
     {
         UriHelper.NavigateTo("tasks/" + tableRowClickEventArgs.Item.Id);
     }
-
-
 
 
 }

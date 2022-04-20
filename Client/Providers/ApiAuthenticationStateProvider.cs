@@ -13,20 +13,20 @@ namespace Client.Providers
 {
     public class ApiAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILocalStorageService _localStorage;
+        private readonly HttpClient httpClient;
+        private readonly ILocalStorageService localStorage;
 
         public ApiAuthenticationStateProvider(HttpClient httpClient, ILocalStorageService localStorage)
         {
-            _httpClient = httpClient;
-            _localStorage = localStorage;
+            this.httpClient = httpClient;
+            this.localStorage = localStorage;
         }
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var savedToken = "";
             try
             {
-                savedToken = await _localStorage.GetItemAsync<string>("authToken");
+                savedToken = await localStorage.GetItemAsync<string>("authToken");
 
             }
             catch (Exception)
@@ -39,7 +39,7 @@ namespace Client.Providers
             {
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(savedToken), "jwt")));
         }
 

@@ -5,16 +5,16 @@
 @using Data
 @inject WSOSService _WSOSService
 @inject NavigationManager UriHelper
-@inject SubSkillService SubSkillService 
+@inject SubSkillService SubSkillService
 
 <h1>WSOS skill training</h1>
 <MudDivider />
 
 <MudGrid Class="pt-4">
     <MudItem md="3" Class="d-flex min-vh-100">
-        <MudTreeView @bind-SelectedValue="SelectedValue" ServerData="SubSkillService.LoadSubskillsData" Items="TreeItems" CanHover="true">
+        <MudTreeView @bind-SelectedValue="SelectedValue" ServerData="SubSkillService.LoadSubSkillsData" Items="TreeItems" CanHover="true">
             <ItemTemplate>
-                <MudTreeViewItem Value="@context" Text="@context.ViewName" />
+                <MudTreeViewItem Value="@context" Text="@context.ViewName"/>
             </ItemTemplate>
         </MudTreeView>
         <MudDivider Vertical="true" FlexItem="true" />
@@ -38,28 +38,36 @@
                 }
             </div>
             <div class="pl-1">
-                <div>
-                    <h4>Theory</h4>
-                    <MudPaper Style="@($"background:{ Colors.BlueGrey.Lighten4 }")" Class="pt-1 pl-2 pr-2">
+                @if (SelectedSubskill.Theory != null)
+                {
 
-                        <MudMarkdown Value="@SelectedSubskill.Theory" />
-                    </MudPaper>
-                </div>
-                <div>
-                    <h4>Tasks</h4>
-                    <MudTable Items="@SelectedSubskill.SubSkillTasks" Hover="true" OnRowClick="RowClickEvent" T="SubSkillTask">
-                        <HeaderContent>
-                            <MudTh>Name</MudTh>
-                            <MudTh>Author</MudTh>
-                            <MudTh>MaxScore</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Name">@context.Name</MudTd>
-                            <MudTd DataLabel="Author">@context.Author.Login</MudTd>
-                            <MudTd DataLabel="MaxScore">@context.MaxScore</MudTd>
-                        </RowTemplate>
-                    </MudTable>
-                </div>
+                    <div>
+                        <h4>Theory</h4>
+                        <MudPaper Style="@($"background:{ Colors.BlueGrey.Lighten4 }")" Class="pt-1 pl-2 pr-2">
+
+                            <MudMarkdown Value="@SelectedSubskill.Theory" />
+                        </MudPaper>
+                    </div>
+                }
+                @if (selectedSubskill.SubSkillTasks.Count != 0)
+                {
+
+                    <div>
+                        <h4>Tasks</h4>
+                        <MudTable Items="@SelectedSubskill.SubSkillTasks" Hover="true" OnRowClick="RowClickEvent" T="SubSkillTask">
+                            <HeaderContent>
+                                <MudTh>Name</MudTh>
+                                <MudTh>Author</MudTh>
+                                <MudTh>MaxScore</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Name">@context.Name</MudTd>
+                                <MudTd DataLabel="Author">@context.Author.Login</MudTd>
+                                <MudTd DataLabel="MaxScore">@context.MaxScore</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    </div>
+                }
 
             </div>
 

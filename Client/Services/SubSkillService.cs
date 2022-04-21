@@ -17,7 +17,7 @@ namespace Client.Services
             this.appDBContext = appDBContext;
         }
 
-        public async Task<HashSet<TreeItem>> LoadSubskillsData(TreeItem treeItem)
+        public async Task<HashSet<TreeItem>> LoadSubSkillsData(TreeItem treeItem)
         {
 
             if (treeItem.IsWSOS)
@@ -29,6 +29,7 @@ namespace Client.Services
                                 Name = s.Name,
                                 Id = s.Id,
                                 IsWSOS = false,
+                                HasChild = appDBContext.SubSkills.Count(a => s.Id == a.ParentSubSkillId) != 0,
                                 ViewNumber = treeItem.ViewNumber + "." + (i + 1).ToString()
                             })
                             .ToHashSet();
@@ -38,16 +39,18 @@ namespace Client.Services
                 var SubSkill = await appDBContext.SubSkills
                                                     .Include(s => s.InverseParentSubSkill)
                                                     .FirstOrDefaultAsync(s => s.Id == treeItem.Id);
-                return SubSkill.InverseParentSubSkill
+                var result =  SubSkill.InverseParentSubSkill
                                 .Select((s, i) => new TreeItem()
                                 {
                                     Name = s.Name,
                                     Id = s.Id,
                                     IsWSOS = false,
+                                    // TODO: come up with a simple solution
+                                    HasChild = appDBContext.SubSkills.Count(a => s.Id == a.ParentSubSkillId) != 0,
                                     ViewNumber = treeItem.ViewNumber + "." + (i + 1).ToString()
                                 })
                                 .ToHashSet();
-
+                return result;
             }
         }
 

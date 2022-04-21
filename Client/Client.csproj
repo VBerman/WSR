@@ -30,7 +30,6 @@
 
   <ItemGroup>
     <Folder Include="Data\ModelPartial\" />
-    <Folder Include="Pages\Participant\" />
   </ItemGroup>
 
   <ItemGroup>

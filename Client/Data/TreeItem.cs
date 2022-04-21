@@ -14,6 +14,7 @@ namespace Client.Data
         public int Id { get; set; }
 
         public bool IsWSOS { get; set; }
+        public bool HasChild { get; set; }
 
         public string ViewName { 
             get { return ViewNumber + ' ' + Name; } 

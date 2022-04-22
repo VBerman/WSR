@@ -14,7 +14,7 @@
     <MudItem md="3" Class="d-flex min-vh-100">
         <MudTreeView @bind-SelectedValue="SelectedValue" ServerData="SubSkillService.LoadSubSkillsData" Items="TreeItems" CanHover="true">
             <ItemTemplate>
-                <MudTreeViewItem Value="@context" Text="@context.ViewName"/>
+                <MudTreeViewItem   Value="@context" Text="@context.ViewName"/>
             </ItemTemplate>
         </MudTreeView>
         <MudDivider Vertical="true" FlexItem="true" />

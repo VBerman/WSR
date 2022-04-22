@@ -28,7 +28,7 @@ namespace Client.Services
                                                     Id = w.Id,
                                                     IsWSOS = true,
                                                     ViewNumber = (i + 1).ToString(),
-                                                    HasChild = true
+                                                    //HasChild = true
                                                 })
                                                 .ToHashSetAsync();
             return data;

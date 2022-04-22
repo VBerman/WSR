@@ -29,7 +29,7 @@ namespace Client.Services
                                 Name = s.Name,
                                 Id = s.Id,
                                 IsWSOS = false,
-                                HasChild = appDBContext.SubSkills.Count(a => s.Id == a.ParentSubSkillId) != 0,
+                                //HasChild = appDBContext.SubSkills.Count(a => s.Id == a.ParentSubSkillId) != 0,
                                 ViewNumber = treeItem.ViewNumber + "." + (i + 1).ToString()
                             })
                             .ToHashSet();
@@ -46,7 +46,7 @@ namespace Client.Services
                                     Id = s.Id,
                                     IsWSOS = false,
                                     // TODO: come up with a simple solution
-                                    HasChild = appDBContext.SubSkills.Count(a => s.Id == a.ParentSubSkillId) != 0,
+                                    //HasChild = appDBContext.SubSkills.Count(a => s.Id == a.ParentSubSkillId) != 0,
                                     ViewNumber = treeItem.ViewNumber + "." + (i + 1).ToString()
                                 })
                                 .ToHashSet();

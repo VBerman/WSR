@@ -66,5 +66,22 @@ namespace Client.Services
                 return data;
             }
         }
+
+        public async Task DeleteSubSkill(SubSkill subSkill)
+        {
+            await RecursionDeleteSubSkill(subSkill);
+            await appDBContext.SaveChangesAsync();
+        }
+
+        public async Task RecursionDeleteSubSkill(SubSkill subSkill)
+        {
+            foreach (var item in subSkill.InverseParentSubSkill)
+            {
+                await RecursionDeleteSubSkill(item);
+            }
+            appDBContext.SubSkills.Remove(subSkill);
+        }
+
+        
     }
 }

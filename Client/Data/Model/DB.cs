@@ -282,7 +282,8 @@ namespace Client.Data.Model
                 entity.HasOne(d => d.ParentSubSkill)
                     .WithMany(p => p.InverseParentSubSkill)
                     .HasForeignKey(d => d.ParentSubSkillId)
-                    .HasConstraintName("FK_SubSkill_SubSkill");
+                    .HasConstraintName("FK_SubSkill_SubSkill")
+                    .OnDelete(DeleteBehavior.ClientSetNull);
 
                 entity.HasOne(d => d.WSOS)
                     .WithMany(p => p.SubSkills)

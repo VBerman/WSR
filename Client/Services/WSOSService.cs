@@ -18,7 +18,7 @@ namespace Client.Services
 
         }
 
-        public async Task<HashSet<TreeItem>> GetAllWSOSAsync()
+        public async Task<HashSet<TreeItem>> GetWSOSWithoutNestingAsync()
         {
 
             var data = await appDBContext.WSOS.AsAsyncEnumerable()
@@ -35,5 +35,8 @@ namespace Client.Services
         }
 
         
+
+
+
     }
 }

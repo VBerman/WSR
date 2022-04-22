@@ -6,17 +6,25 @@
 @inject WSOSService _WSOSService
 @inject NavigationManager UriHelper
 @inject SubSkillService SubSkillService
+@inject IDialogService DialogService
 
 <h1>WSOS skill training</h1>
 <MudDivider />
 
 <MudGrid Class="pt-4">
+
     <MudItem md="3" Class="d-flex min-vh-100">
-        <MudTreeView @bind-SelectedValue="SelectedValue" ServerData="SubSkillService.LoadSubSkillsData" Items="TreeItems" CanHover="true">
-            <ItemTemplate>
-                <MudTreeViewItem   Value="@context" Text="@context.ViewName"/>
-            </ItemTemplate>
-        </MudTreeView>
+        <div>
+            <AuthorizeView Roles="Trainer">
+                <MudButton OnClick="EditTree" FullWidth="true">Edit tree</MudButton>
+
+            </AuthorizeView>
+            <MudTreeView MaxHeight="80vh"  @bind-SelectedValue="SelectedValue" ServerData="SubSkillService.LoadSubSkillsData" Items="TreeItems" CanHover="true">
+                <ItemTemplate>
+                    <MudTreeViewItem Value="@context" Text="@context.ViewName" />
+                </ItemTemplate>
+            </MudTreeView>
+        </div>
         <MudDivider Vertical="true" FlexItem="true" />
     </MudItem>
 
@@ -118,7 +126,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        TreeItems = await Task.Run(() => _WSOSService.GetAllWSOSAsync());
+        TreeItems = await Task.Run(() => _WSOSService.GetWSOSWithoutNestingAsync());
     }
 
     private void RowClickEvent(TableRowClickEventArgs<SubSkillTask> tableRowClickEventArgs)
@@ -126,5 +134,17 @@
         UriHelper.NavigateTo("tasks/" + tableRowClickEventArgs.Item.Id);
     }
 
+    private async Task EditTree()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("TreeItems", TreeItems);
+        var options = new DialogOptions() { };
+        var dialog = DialogService.Show<Dialogs.TreeCRUD>("Edit tree", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+
+        }
+    }
 
 }

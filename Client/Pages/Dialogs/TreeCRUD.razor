@@ -1,9 +1,87 @@
-﻿<MudDialog>
-    <DialogContent>
-        Hello bro! Again u?
-    </DialogContent>
-    <DialogActions>
-        <MudButton>Cancel</MudButton>
-        <MudButton>Save changes</MudButton>
-    </DialogActions>
-</MudDialog>
+﻿@using Services
+@using Data
+@using Data.Model
+@inject WSOSService _WSOSService
+@inject NavigationManager UriHelper
+@inject SubSkillService SubSkillService
+    <MudPaper>
+
+        <MudContainer>
+
+            <MudToolBar>
+                <MudIconButton OnClick="Add" Icon="@Icons.Material.Outlined.Add" />
+                @*<MudIconButton Icon="@Icons.Material.Outlined.Edit" />*@
+                <MudIconButton Icon="@Icons.Material.Outlined.ArrowCircleUp" Color="Color.Inherit" />
+                <MudSpacer/>
+                <MudIconButton OnClick="Delete" Icon="@Icons.Material.Outlined.Delete" Color="Color.Inherit" />
+            </MudToolBar>
+            <MudDialog>
+                <DialogContent>
+                    <MudItem>
+                        <MudTreeView MaxHeight="70vh" @bind-SelectedValue="SelectedValue" @bind-SelectedValues="SelectedValues" MultiSelection="true" ServerData="SubSkillService.LoadSubSkillsData" Items="TreeItems" CanHover="true">
+                            <ItemTemplate>
+                                <MudTreeViewItem Value="@context" Text="@context.ViewName" />
+                            </ItemTemplate>
+                        </MudTreeView>
+                        <MudDivider Vertical="true" FlexItem="true" />
+                    </MudItem>
+                </DialogContent>
+                <DialogActions>
+                    <MudButton OnClick="MudDialog.Cancel">Cancel</MudButton>
+                    @*<MudButton>Save changes</MudButton>*@
+                </DialogActions>
+            </MudDialog>
+        </MudContainer>
+    </MudPaper>
+    @code {
+        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+        private TreeItem? selectedValue;
+
+        public TreeItem? SelectedValue
+        {
+            get { return selectedValue; }
+            set
+            {
+                if (value != null)
+                {
+                    selectedValue = value;
+
+                    InvokeAsync(async () => { SelectedSubskill = await SubSkillService.LoadSubSkillFromTreeItem(value); });
+
+                }
+            }
+        }
+
+        private SubSkill? selectedSubskill;
+
+        public SubSkill? SelectedSubskill
+        {
+            get { return selectedSubskill; }
+            set
+            {
+                selectedSubskill = value;
+                StateHasChanged();
+            }
+
+        }
+
+
+
+        public HashSet<TreeItem> SelectedValues = new HashSet<TreeItem>();
+
+
+        [Parameter] public HashSet<TreeItem> TreeItems { get; set; }
+
+        private async Task Delete()
+        {
+            await SubSkillService.DeleteSubSkill(SelectedSubskill);
+        }
+
+        private void Add()
+        {
+
+        }
+
+
+    }

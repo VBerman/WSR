@@ -75,6 +75,9 @@ namespace Client.Services
 
         public async Task RecursionDeleteSubSkill(SubSkill subSkill)
         {
+
+            subSkill = appDBContext.SubSkills.Include(s => s.InverseParentSubSkill).FirstOrDefault(s => s.Id == subSkill.Id);
+
             foreach (var item in subSkill.InverseParentSubSkill)
             {
                 await RecursionDeleteSubSkill(item);
@@ -82,6 +85,16 @@ namespace Client.Services
             appDBContext.SubSkills.Remove(subSkill);
         }
 
-        
+        public async Task<int> QuantityChildSubSkills(SubSkill subSkill)
+        {
+            var quantity = 0;
+            subSkill = appDBContext.SubSkills.Include(s => s.InverseParentSubSkill).FirstOrDefault(s => s.Id == subSkill.Id);
+            foreach (var item in subSkill.InverseParentSubSkill)
+            {
+                quantity += await QuantityChildSubSkills(item);
+            }
+            quantity += subSkill.InverseParentSubSkill.Count;
+            return quantity;
+        }
     }
 }

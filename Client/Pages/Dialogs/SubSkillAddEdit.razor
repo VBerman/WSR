@@ -75,8 +75,9 @@
         }
         else
         {
-            result = await SubSkillService.UpdateSubSkill(SubSkill);
+            result = await SubSkillService.UpdateSubSkill();
         }
+
         if (result)
         {
             Snackbar.Add($"Successfully saved subskill.", Severity.Success);

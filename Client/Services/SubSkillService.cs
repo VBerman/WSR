@@ -107,12 +107,12 @@ namespace Client.Services
             }
             catch (Exception)
             {
-
+                appDBContext.ChangeTracker.Clear();
                 return false;
             }
         }
 
-        public async Task<bool> UpdateSubSkill(SubSkill subSkill)
+        public async Task<bool> UpdateSubSkill()
         {
             try
             {
@@ -121,7 +121,7 @@ namespace Client.Services
             }
             catch (Exception)
             {
-
+                appDBContext.ChangeTracker.Clear();
                 return false;
             }
         }

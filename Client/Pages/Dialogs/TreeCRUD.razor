@@ -12,7 +12,7 @@
         <MudToolBar>
             <MudIconButton OnClick="Create" Icon="@Icons.Material.Outlined.Add" />
             <MudIconButton OnClick="Update" Icon="@Icons.Material.Outlined.Edit" />
-            <MudIconButton Icon="@Icons.Material.Outlined.ArrowCircleUp" Color="Color.Inherit" />
+            <MudIconButton OnClick="Move" Icon="@Icons.Material.Outlined.ArrowCircleUp" Color="Color.Inherit" />
             <MudSpacer />
             <MudIconButton OnClick="Delete" Icon="@Icons.Material.Outlined.Delete" Color="Color.Inherit" />
         </MudToolBar>
@@ -152,6 +152,60 @@
             var dialog = DialogService.Show<Dialogs.SubSkillAddEdit>($"Update SubSkill to {SelectedValue.Name}", parameters, options);
             var result = await dialog.Result;
             RefreshTree();
+        }
+    }
+
+    private async Task Move()
+    {
+        if (SelectedValue == null)
+        {
+            Snackbar.Add($"Select tree item", Severity.Error);
+        }
+        else if (SelectedValues.Count == 0)
+        {
+            Snackbar.Add($"Choose tree item/s", Severity.Error);
+        }
+        else if (SelectedValue.IsWSOS)
+        {
+            foreach (var item in SelectedValues)
+            {
+                var subSkill = await SubSkillService.LoadSubSkillFromTreeItem(item);
+                subSkill.WSOSId = SelectedValue.Id;
+                subSkill.ParentSubSkillId = null;
+
+            }
+            var result = await SubSkillService.UpdateSubSkill();
+            if (result)
+            {
+                Snackbar.Add($"Successfully move subskill/s.", Severity.Success);
+                RefreshTree();
+
+            }
+            else
+            {
+                Snackbar.Add($"Error move subskills", Severity.Error);
+            }
+        }
+        else
+        {
+            foreach (var item in SelectedValues)
+            {
+                var subSkill = await SubSkillService.LoadSubSkillFromTreeItem(item);
+                subSkill.ParentSubSkillId = SelectedValue.Id;
+                subSkill.WSOSId = null;
+
+            }
+            var result = await SubSkillService.UpdateSubSkill();
+            if (result)
+            {
+                Snackbar.Add($"Successfully move subskill/s.", Severity.Success);
+                RefreshTree();
+
+            }
+            else
+            {
+                Snackbar.Add($"Error move subskills", Severity.Error);
+            }
         }
     }
 }

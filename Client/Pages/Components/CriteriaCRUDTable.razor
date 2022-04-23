@@ -1,8 +1,17 @@
-﻿
+﻿@using Services
 @using Data.Model
+@inject UserService UserService
 
 <MudTable Items="@SubSkillCriteria.Select((s, i) => new { Row = i + 1, SubSkill = s })" Hover="true"
-          CanCancelEdit="true" ReadOnly="false">
+          CanCancelEdit="true" ReadOnly="@IsReadOnly">
+    <ColGroup>
+        <col />
+        <col />
+        <col />
+        <col />
+        <col  />
+
+    </ColGroup>
     <HeaderContent>
 
         <MudTh>#</MudTh>
@@ -10,9 +19,9 @@
 
         <MudTh>Description</MudTh>
         <MudTh>Max mark</MudTh>
-        <AuthorizeView Roles="Trainer">
-            <MudTh>Options</MudTh>
-        </AuthorizeView>
+
+        <MudTh >Options</MudTh>
+
     </HeaderContent>
     <RowTemplate>
 
@@ -24,9 +33,11 @@
 
         </MudTd>
         <MudTd DataLabel="Max mark">@context.SubSkill.MaxMark</MudTd>
+
         <MudTd DataLabel="Options">
             <MudIconButton Icon="@Icons.Outlined.Delete"></MudIconButton>
         </MudTd>
+
     </RowTemplate>
     <RowEditingTemplate>
         <MudTd DataLabel="#">@context.Row</MudTd>
@@ -49,4 +60,12 @@
 
 @code {
     [Parameter] public ICollection<SubSkillCriterion> SubSkillCriteria { get; set; }
+
+
+    public bool IsReadOnly { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsReadOnly = !(await UserService.HasRole("Trainer"));
+    }
 }

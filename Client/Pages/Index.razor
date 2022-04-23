@@ -130,7 +130,6 @@
     protected override async Task OnInitializedAsync()
     {
         TreeItems = await WSOSService.GetWSOSWithoutNestingAsync();
-        
     }
 
     private void RowClickEvent(TableRowClickEventArgs<SubSkillTask> tableRowClickEventArgs)

@@ -24,6 +24,15 @@ namespace Client.Services
             return int.Parse(state.User.Claims.FirstOrDefault(c => c.Type == "Id").Value);
         }
 
+        public async Task<bool> HasRole(string roleName)
+        {
+            var state = await apiAuthenticationStateProvider.GetAuthenticationStateAsync();
+            return state.User.Claims.Where(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
+                            .FirstOrDefault(c => c.Value == roleName) != null;
+
+        }
+
+
 
     }
 }

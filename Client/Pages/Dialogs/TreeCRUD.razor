@@ -1,7 +1,7 @@
 ﻿@using Services
 @using Data
 @using Data.Model
-@inject WSOSService _WSOSService
+@inject WSOSService WSOSService
 @inject NavigationManager UriHelper
 @inject SubSkillService SubSkillService
 @inject ISnackbar Snackbar
@@ -12,7 +12,7 @@
         <MudToolBar>
             <MudIconButton OnClick="Create" Icon="@Icons.Material.Outlined.Add" />
             <MudIconButton OnClick="Update" Icon="@Icons.Material.Outlined.Edit" />
-            <MudIconButton OnClick="Move" Icon="@Icons.Material.Outlined.ArrowCircleUp" Color="Color.Inherit" />
+            <MudIconButton OnClick="Move" Icon="@Icons.Material.Outlined.ArrowCircleUp"  />
             <MudSpacer />
             <MudIconButton OnClick="Delete" Icon="@Icons.Material.Outlined.Delete" Color="Color.Inherit" />
         </MudToolBar>
@@ -79,19 +79,41 @@
 
     private async Task Delete()
     {
-        var quantityChild = await SubSkillService.QuantityChildSubSkills(SelectedSubskill) + 1;
-        bool? result = await DialogService.ShowMessageBox(
-            "Warning",
-            $"U will delete {quantityChild} subskill/s, are u wanna it?",
-            yesText: "Delete!",
-            noText: "NO PLZ");
-        if (result == true)
+        if (SelectedValue == null)
         {
-            await SubSkillService.DeleteSubSkill(SelectedSubskill);
+            Snackbar.Add($"Choose WSOS/subskill.", Severity.Error);
+        }
+        else if (SelectedValue.IsWSOS)
+        {
 
-            Snackbar.Add($"Successfully deleted {quantityChild} subskill/s.", Severity.Success);
-            InvokeAsync(RefreshTree);
+            var quantityChild = await WSOSService.QuantityChildSubSkills(SelectedValue.Id);
+            bool? result = await DialogService.ShowMessageBox(
+                "Warning",
+                $"U will delete 1 WSOS and {quantityChild} subskill/s, are u wanna it?",
+                yesText: "Delete!",
+                noText: "NO PLZ");
+        }
+        else
+        {
 
+            var quantityChild = await SubSkillService.QuantityChildSubSkills(SelectedSubskill) + 1;
+            bool? result = await DialogService.ShowMessageBox(
+                "Warning",
+                $"U will delete {quantityChild} subskill/s, are u wanna it?",
+                yesText: "Delete!",
+                noText: "NO PLZ");
+            if (result == true)
+            {
+                await SubSkillService.DeleteSubSkill(SelectedSubskill);
+
+                Snackbar.Add($"Successfully deleted {quantityChild} subskill/s.", Severity.Success);
+                InvokeAsync(RefreshTree);
+
+            }
+            else
+            {
+                Snackbar.Add($"Error deleted subskill/s.", Severity.Error);
+            }
         }
 
 
@@ -101,7 +123,7 @@
     {
         // TODO: it's like a magic
         TreeItems.Clear();
-        TreeItems = await _WSOSService.GetWSOSWithoutNestingAsync();
+        TreeItems = await WSOSService.GetWSOSWithoutNestingAsync();
         InvokeAsync(StateHasChanged);
 
     }
@@ -110,6 +132,14 @@
     {
         if (SelectedValue == null)
         {
+
+            var parameters = new DialogParameters();
+            parameters.Add("WSOS", new WSOS());
+            var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
+
+            var dialog = DialogService.Show<Dialogs.WSOSAddEdit>($"Add new WSOS", parameters, options);
+            var result = await dialog.Result;
+            RefreshTree();
 
         }
         else
@@ -130,7 +160,10 @@
             var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
             var dialog = DialogService.Show<Dialogs.SubSkillAddEdit>($"Add SubSkill to {SelectedValue.Name}", parameters, options);
             var result = await dialog.Result;
-            RefreshTree();
+            if (!result.Cancelled)
+            {
+                InvokeAsync(RefreshTree);
+            }
         }
 
 
@@ -143,10 +176,7 @@
         }
         else
         {
-
             var parameters = new DialogParameters();
-
-
             parameters.Add("SubSkill", SelectedSubskill);
             var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
             var dialog = DialogService.Show<Dialogs.SubSkillAddEdit>($"Update SubSkill to {SelectedValue.Name}", parameters, options);

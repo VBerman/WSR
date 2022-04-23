@@ -333,6 +333,7 @@ namespace Client.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Theory")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("WSOSId")
@@ -1220,7 +1221,9 @@ namespace Client.Migrations
                     b.HasOne("Client.Data.Model.Skill", "SkillCodeNavigation")
                         .WithMany("WSOS")
                         .HasForeignKey("SkillCode")
-                        .HasConstraintName("FK_WSOS_Skill");
+                        .HasConstraintName("FK_WSOS_Skill")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("SkillCodeNavigation");
                 });

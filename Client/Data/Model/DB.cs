@@ -288,7 +288,8 @@ namespace Client.Data.Model
                 entity.HasOne(d => d.WSOS)
                     .WithMany(p => p.SubSkills)
                     .HasForeignKey(d => d.WSOSId)
-                    .HasConstraintName("FK_SubSkill_WSOS");
+                    .HasConstraintName("FK_SubSkill_WSOS")
+                    .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
             modelBuilder.Entity<SubSkillMark>(entity =>

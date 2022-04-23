@@ -57,6 +57,7 @@ namespace Client
             services.AddScoped<TaskService>();
             services.AddScoped<SubSkillService>();
             services.AddScoped<TaskResolvingService>();
+            services.AddScoped<SkillService>();
             services.AddDbContext<DB>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("PublicServer"))
             );

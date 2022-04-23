@@ -1,8 +1,6 @@
 ﻿@using Services
-@using Data
 @using Data.Model
 @inject WSOSService _WSOSService
-@inject NavigationManager UriHelper
 @inject SubSkillService SubSkillService
 @inject ISnackbar Snackbar
 <EditForm Model="@SubSkill" OnValidSubmit="HandleSaveSubSkill">

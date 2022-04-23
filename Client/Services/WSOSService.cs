@@ -5,16 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-
+using Client.Services;
 namespace Client.Services
 {
     public class WSOSService
     {
         private readonly DB appDBContext;
+        private readonly SubSkillService subSkillService;
 
-        public WSOSService(DB appDBContext)
+        public WSOSService(DB appDBContext, SubSkillService subSkillService)
         {
             this.appDBContext = appDBContext;
+            this.subSkillService = subSkillService;
 
         }
 
@@ -37,6 +39,38 @@ namespace Client.Services
         
 
 
+        public async Task<bool> CreateWSOS(WSOS _WSOS)
+        {
+            try
+            {
+                await appDBContext.WSOS.AddAsync(_WSOS);
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
 
+                return false;
+            }
+        }
+
+        public async Task<int> QuantityChildSubSkills(int _WSOSId)
+        {
+            var findedWSOS = await appDBContext.WSOS.Include(w => w.SubSkills).AsAsyncEnumerable().FirstOrDefaultAsync(w => w.Id == _WSOSId);
+
+            var tasks = new List<Task<int>>();
+            foreach (var item in findedWSOS.SubSkills)
+            {
+                tasks.Add(subSkillService.QuantityChildSubSkills(item));
+            }
+            await Task.WhenAll(tasks);
+            var sum = findedWSOS.SubSkills.Count;
+            foreach (var item in tasks)
+            {
+                sum += item.Result;
+            }
+
+            return sum;
+        }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using Client.Data.Model;
-using Client.Providers;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,25 +7,23 @@ using System.Threading.Tasks;
 
 namespace Client.Services
 {
-    public class TaskService
+    public class UserService
     {
         private readonly DB appDBContext;
         private readonly AuthenticationStateProvider apiAuthenticationStateProvider;
-
-
-        public TaskService(DB appDBContext, AuthenticationStateProvider apiAuthenticationStateProvider)
+        public UserService(DB appDBContext, AuthenticationStateProvider apiAuthenticationStateProvider)
         {
             this.appDBContext = appDBContext;
             this.apiAuthenticationStateProvider = apiAuthenticationStateProvider;
+
+        }
+        public async Task<int> GetUserId()
+        {
+            var state = await apiAuthenticationStateProvider.GetAuthenticationStateAsync();
+
+            return int.Parse(state.User.Claims.FirstOrDefault(c => c.Type == "Id").Value);
         }
 
-        public async Task<SubSkillTask?> GetSubSkillTask(int id)
-        {
-           
-            var data = await appDBContext.SubSkillTasks.Include(s => s.TestProject).Include(s => s.Author).Include(s => s.SubSkill).FirstOrDefaultAsync(s => s.Id == id);
-            return data;
-        }
-        
 
     }
 }

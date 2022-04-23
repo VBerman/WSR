@@ -58,6 +58,7 @@ namespace Client.Providers
         }
         private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
+            
             var claims = new List<Claim>();
             var payload = jwt.Split('.')[1];
             var jsonBytes = ParseBase64WithoutPadding(payload);
@@ -98,5 +99,8 @@ namespace Client.Providers
             }
             return Convert.FromBase64String(base64);
         }
+
+      
+        
     }
 }

@@ -1,0 +1,52 @@
+﻿
+@using Data.Model
+
+<MudTable Items="@SubSkillCriteria.Select((s, i) => new { Row = i + 1, SubSkill = s })" Hover="true"
+          CanCancelEdit="true" ReadOnly="false">
+    <HeaderContent>
+
+        <MudTh>#</MudTh>
+        <MudTh>Name</MudTh>
+
+        <MudTh>Description</MudTh>
+        <MudTh>Max mark</MudTh>
+        <AuthorizeView Roles="Trainer">
+            <MudTh>Options</MudTh>
+        </AuthorizeView>
+    </HeaderContent>
+    <RowTemplate>
+
+        <MudTd DataLabel="#">@context.Row</MudTd>
+        <MudTd DataLabel="Name">@context.SubSkill.Name</MudTd>
+
+        <MudTd DataLabel="Description">
+            <MudTextField ReadOnly="true" Style="margin: 0px 0px 0px 0px" Value="@context.SubSkill.Description" Lines="@(context.SubSkill.Description.Count(c => c == '\n') + 1)" />
+
+        </MudTd>
+        <MudTd DataLabel="Max mark">@context.SubSkill.MaxMark</MudTd>
+        <MudTd DataLabel="Options">
+            <MudIconButton Icon="@Icons.Outlined.Delete"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="#">@context.Row</MudTd>
+        <MudTd DataLabel="Name">
+            <MudTextField @bind-Value="@context.SubSkill.Name" Style="margin: unset" Required="true" MaxLength="100" />
+        </MudTd>
+
+        <MudTd DataLabel="Description">
+            <MudTextField Style="margin: unset" InputMode="InputMode.text" @bind-Value="@context.SubSkill.Description"
+                          Lines="@(context.SubSkill.Description.Count(c => c == '\n') + 2)"
+                          Required="true" />
+
+        </MudTd>
+        <MudTd DataLabel="Max mark">
+            <MudNumericField @bind-Value="@context.SubSkill.MaxMark" InputMode="InputMode.numeric" Min="0" For="@(() => context.SubSkill.MaxMark)" />
+        </MudTd>
+
+    </RowEditingTemplate>
+</MudTable>
+
+@code {
+    [Parameter] public ICollection<SubSkillCriterion> SubSkillCriteria { get; set; }
+}

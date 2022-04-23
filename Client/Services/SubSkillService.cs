@@ -62,7 +62,9 @@ namespace Client.Services
             }
             else
             {
-                var data = await appDBContext.SubSkills.Include(s => s.SubSkillTasks).ThenInclude(ss => ss.Author).AsQueryable().FirstOrDefaultAsync(s => s.Id == treeItem.Id);
+                var data = await appDBContext.SubSkills.Include(s => s.SubSkillTasks).ThenInclude(ss => ss.Author)
+                                                        .Include(s => s.SubSkillCriteria).AsQueryable()
+                                                        .FirstOrDefaultAsync(s => s.Id == treeItem.Id);
                 return data;
             }
         }
@@ -75,7 +77,7 @@ namespace Client.Services
                 await appDBContext.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return false;

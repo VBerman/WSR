@@ -348,6 +348,37 @@ namespace Client.Migrations
                     b.ToTable("SubSkill");
                 });
 
+            modelBuilder.Entity("Client.Data.Model.SubSkillCriterion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsMeas")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("MaxMark")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("SubSkillId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubSkillId");
+
+                    b.ToTable("SubSkillCriterion");
+                });
+
             modelBuilder.Entity("Client.Data.Model.SubSkillMark", b =>
                 {
                     b.Property<int>("Id")
@@ -995,6 +1026,17 @@ namespace Client.Migrations
                     b.Navigation("WSOS");
                 });
 
+            modelBuilder.Entity("Client.Data.Model.SubSkillCriterion", b =>
+                {
+                    b.HasOne("Client.Data.Model.SubSkill", "SubSkill")
+                        .WithMany("SubSkillCriteria")
+                        .HasForeignKey("SubSkillId")
+                        .HasConstraintName("FK_SubSkillCritetion_SubSkill")
+                        .IsRequired();
+
+                    b.Navigation("SubSkill");
+                });
+
             modelBuilder.Entity("Client.Data.Model.SubSkillMark", b =>
                 {
                     b.HasOne("Client.Data.Model.User", "Competitor")
@@ -1286,6 +1328,8 @@ namespace Client.Migrations
             modelBuilder.Entity("Client.Data.Model.SubSkill", b =>
                 {
                     b.Navigation("InverseParentSubSkill");
+
+                    b.Navigation("SubSkillCriteria");
 
                     b.Navigation("SubSkillMarks");
 

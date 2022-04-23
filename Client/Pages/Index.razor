@@ -1,13 +1,12 @@
-﻿
-@page "/"
+﻿@page "/"
 @using Data.Model
 @using Services
 @using Data
-@inject WSOSService _WSOSService
+@inject WSOSService WSOSService
 @inject NavigationManager UriHelper
 @inject SubSkillService SubSkillService
 @inject IDialogService DialogService
-
+@inject UserService UserService 
 <h1>WSOS skill training</h1>
 <MudDivider />
 
@@ -19,7 +18,7 @@
                 <MudButton OnClick="EditTree" FullWidth="true">Edit tree</MudButton>
 
             </AuthorizeView>
-            <MudTreeView MaxHeight="80vh"  @bind-SelectedValue="SelectedValue" ServerData="SubSkillService.LoadSubSkillsData" Items="TreeItems" CanHover="true">
+            <MudTreeView MaxHeight="80vh" @bind-SelectedValue="SelectedValue" ServerData="SubSkillService.LoadSubSkillsData" Items="TreeItems" CanHover="true">
                 <ItemTemplate>
                     <MudTreeViewItem Value="@context" Text="@context.ViewName" />
                 </ItemTemplate>
@@ -76,7 +75,11 @@
                         </MudTable>
                     </div>
                 }
-
+                <div>
+                    <h4>Criteria</h4>
+                    <CriteriaCRUDTable SubSkillCriteria="@SelectedSubskill.SubSkillCriteria"></CriteriaCRUDTable>
+                    
+                </div>
             </div>
 
 
@@ -126,7 +129,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        TreeItems = await _WSOSService.GetWSOSWithoutNestingAsync();
+        TreeItems = await WSOSService.GetWSOSWithoutNestingAsync();
+        
     }
 
     private void RowClickEvent(TableRowClickEventArgs<SubSkillTask> tableRowClickEventArgs)
@@ -148,9 +152,10 @@
     {
 
         TreeItems.Clear();
-        TreeItems = await _WSOSService.GetWSOSWithoutNestingAsync();
+        TreeItems = await WSOSService.GetWSOSWithoutNestingAsync();
         InvokeAsync(StateHasChanged);
 
     }
 
+    
 }

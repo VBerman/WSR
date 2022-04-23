@@ -13,6 +13,7 @@ namespace Client.Data.Model
             InverseParentSubSkill = new HashSet<SubSkill>();
             SubSkillMarks = new HashSet<SubSkillMark>();
             SubSkillTasks = new HashSet<SubSkillTask>();
+            SubSkillCriteria = new HashSet<SubSkillCriterion>();
         }
 
         public int Id { get; set; }
@@ -29,5 +30,7 @@ namespace Client.Data.Model
         public virtual ICollection<SubSkill> InverseParentSubSkill { get; set; }
         public virtual ICollection<SubSkillMark> SubSkillMarks { get; set; }
         public virtual ICollection<SubSkillTask> SubSkillTasks { get; set; }
+
+        public virtual ICollection<SubSkillCriterion> SubSkillCriteria { get; set; }
     }
 }

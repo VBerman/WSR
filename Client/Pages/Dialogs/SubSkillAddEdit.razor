@@ -18,7 +18,7 @@
                 </MudItem>
 
                 <MudItem class="d-flex align-center">
-                    <MudRating Size="Size.Large" SelectedValue="@SubSkillImportance"></MudRating>
+                    <MudRating Size="Size.Large" @bind-SelectedValue="@SubSkillImportance"></MudRating>
                 </MudItem>
             </MudGrid>
             <MudGrid Style="padding: 20px 0 0 0">
@@ -67,9 +67,16 @@
     }
     private async Task HandleSaveSubSkill(EditContext context)
     {
+        var result = false;
+        if (SubSkill.Id == 0)
+        {
 
-
-        var result = await SubSkillService.CreateSubSkill(SubSkill);
+            result = await SubSkillService.CreateSubSkill(SubSkill);
+        }
+        else
+        {
+            result = await SubSkillService.UpdateSubSkill(SubSkill);
+        }
         if (result)
         {
             Snackbar.Add($"Successfully saved subskill.", Severity.Success);

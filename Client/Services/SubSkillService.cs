@@ -111,5 +111,19 @@ namespace Client.Services
                 return false;
             }
         }
+
+        public async Task<bool> UpdateSubSkill(SubSkill subSkill)
+        {
+            try
+            {
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+        }
     }
 }

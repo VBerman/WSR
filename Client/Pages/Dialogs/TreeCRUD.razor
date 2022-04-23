@@ -10,8 +10,8 @@
     <MudContainer>
 
         <MudToolBar>
-            <MudIconButton OnClick="Add" Icon="@Icons.Material.Outlined.Add" />
-            @*<MudIconButton Icon="@Icons.Material.Outlined.Edit" />*@
+            <MudIconButton OnClick="Create" Icon="@Icons.Material.Outlined.Add" />
+            <MudIconButton OnClick="Update" Icon="@Icons.Material.Outlined.Edit" />
             <MudIconButton Icon="@Icons.Material.Outlined.ArrowCircleUp" Color="Color.Inherit" />
             <MudSpacer />
             <MudIconButton OnClick="Delete" Icon="@Icons.Material.Outlined.Delete" Color="Color.Inherit" />
@@ -53,6 +53,7 @@
                 InvokeAsync(async () => { SelectedSubskill = await SubSkillService.LoadSubSkillFromTreeItem(value); });
 
             }
+            selectedValue = value;
         }
     }
 
@@ -64,7 +65,7 @@
         set
         {
             selectedSubskill = value;
-            StateHasChanged();
+
         }
 
     }
@@ -105,7 +106,7 @@
 
     }
 
-    private async Task Add()
+    private async Task Create()
     {
         if (SelectedValue == null)
         {
@@ -126,8 +127,29 @@
             }
 
             parameters.Add("SubSkill", newSubSkill);
-            var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true};
+            var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
             var dialog = DialogService.Show<Dialogs.SubSkillAddEdit>($"Add SubSkill to {SelectedValue.Name}", parameters, options);
+            var result = await dialog.Result;
+            RefreshTree();
+        }
+
+
+    }
+    private async Task Update()
+    {
+        if (SelectedValue == null)
+        {
+
+        }
+        else
+        {
+
+            var parameters = new DialogParameters();
+
+
+            parameters.Add("SubSkill", SelectedSubskill);
+            var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
+            var dialog = DialogService.Show<Dialogs.SubSkillAddEdit>($"Update SubSkill to {SelectedValue.Name}", parameters, options);
             var result = await dialog.Result;
             RefreshTree();
         }

@@ -12,7 +12,7 @@
         <MudToolBar>
             <MudIconButton OnClick="Create" Icon="@Icons.Material.Outlined.Add" />
             <MudIconButton OnClick="Update" Icon="@Icons.Material.Outlined.Edit" />
-            <MudIconButton OnClick="Move" Icon="@Icons.Material.Outlined.ArrowCircleUp"  />
+            <MudIconButton OnClick="Move" Icon="@Icons.Material.Outlined.ArrowCircleUp" />
             <MudSpacer />
             <MudIconButton OnClick="Delete" Icon="@Icons.Material.Outlined.Delete" Color="Color.Inherit" />
         </MudToolBar>
@@ -92,6 +92,17 @@
                 $"U will delete 1 WSOS and {quantityChild} subskill/s, are u wanna it?",
                 yesText: "Delete!",
                 noText: "NO PLZ");
+            if (result == true)
+            {
+                result = await WSOSService.RecursionDeleteWSOS(SelectedValue.Id);
+                if (result == true)
+                {
+                    Snackbar.Add($"Successfully deleted 1 WSOS and {quantityChild} subskill/s.", Severity.Success);
+                    InvokeAsync(RefreshTree);
+
+                }
+                else { Snackbar.Add($"Error deleted 1 WSOS and {quantityChild} subskill/s.", Severity.Error); }
+            }
         }
         else
         {
@@ -104,16 +115,17 @@
                 noText: "NO PLZ");
             if (result == true)
             {
-                await SubSkillService.DeleteSubSkill(SelectedSubskill);
+                result = await SubSkillService.DeleteSubSkill(SelectedSubskill);
 
-                Snackbar.Add($"Successfully deleted {quantityChild} subskill/s.", Severity.Success);
-                InvokeAsync(RefreshTree);
+                if (result == true)
+                {
+                    Snackbar.Add($"Successfully deleted {quantityChild} subskill/s.", Severity.Success);
+                    InvokeAsync(RefreshTree);
 
+                }
+                else { Snackbar.Add($"Error deleted {quantityChild} subskill/s.", Severity.Error); }
             }
-            else
-            {
-                Snackbar.Add($"Error deleted subskill/s.", Severity.Error);
-            }
+
         }
 
 

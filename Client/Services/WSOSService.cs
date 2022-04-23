@@ -72,5 +72,34 @@ namespace Client.Services
 
             return sum;
         }
+
+        public async Task<bool> RecursionDeleteWSOS(int _WSOSId)
+        {
+
+            var findedWSOS = await appDBContext.WSOS.Include(w => w.SubSkills).AsAsyncEnumerable().FirstOrDefaultAsync(w => w.Id == _WSOSId);
+            var tasks = new List<bool?>() ;
+            foreach (var item in findedWSOS.SubSkills)
+            {
+                tasks.Add(await subSkillService.DeleteSubSkill(item));
+            }
+            if (tasks.FirstOrDefault(t => t == false) == null)
+            {
+                try
+                {
+                    appDBContext.WSOS.Remove(findedWSOS);
+                    await appDBContext.SaveChangesAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                        
+                }
+            }
+            else return false;
+
+            }
+ 
+        }
     }
-}
+

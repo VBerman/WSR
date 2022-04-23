@@ -39,7 +39,7 @@ namespace Client.Services
                 var SubSkill = await appDBContext.SubSkills
                                                     .Include(s => s.InverseParentSubSkill)
                                                     .FirstOrDefaultAsync(s => s.Id == treeItem.Id);
-                var result =  SubSkill.InverseParentSubSkill
+                var result = SubSkill.InverseParentSubSkill
                                 .Select((s, i) => new TreeItem()
                                 {
                                     Name = s.Name,
@@ -67,10 +67,19 @@ namespace Client.Services
             }
         }
 
-        public async Task DeleteSubSkill(SubSkill subSkill)
+        public async Task<bool> DeleteSubSkill(SubSkill subSkill)
         {
-            await RecursionDeleteSubSkill(subSkill);
-            await appDBContext.SaveChangesAsync();
+            try
+            {
+                await RecursionDeleteSubSkill(subSkill);
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
         }
 
         public async Task RecursionDeleteSubSkill(SubSkill subSkill)

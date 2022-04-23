@@ -36,7 +36,7 @@ namespace Client.Services
             return data;
         }
 
-        
+
 
 
         public async Task<bool> CreateWSOS(WSOS _WSOS)
@@ -77,7 +77,7 @@ namespace Client.Services
         {
 
             var findedWSOS = await appDBContext.WSOS.Include(w => w.SubSkills).AsAsyncEnumerable().FirstOrDefaultAsync(w => w.Id == _WSOSId);
-            var tasks = new List<bool?>() ;
+            var tasks = new List<bool?>();
             foreach (var item in findedWSOS.SubSkills)
             {
                 tasks.Add(await subSkillService.DeleteSubSkill(item));
@@ -90,16 +90,35 @@ namespace Client.Services
                     await appDBContext.SaveChangesAsync();
                     return true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return false;
-                        
+
                 }
             }
             else return false;
 
+        }
+
+        public async Task<WSOS> FindWSOS(int idWSOS)
+        {
+            return await appDBContext.WSOS.AsAsyncEnumerable().FirstOrDefaultAsync(w => w.Id == idWSOS);
+        }
+        
+        public async Task<bool> UpdateWSOS()
+        {
+            try
+            {
+                await appDBContext.SaveChangesAsync();
+                return true;
             }
- 
+            catch (Exception)
+            {
+                appDBContext.ChangeTracker.Clear();
+                return false;
+            }
         }
     }
+
+}
 

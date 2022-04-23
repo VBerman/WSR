@@ -98,10 +98,12 @@
                 if (result == true)
                 {
                     Snackbar.Add($"Successfully deleted 1 WSOS and {quantityChild} subskill/s.", Severity.Success);
-                    InvokeAsync(RefreshTree);
-
                 }
-                else { Snackbar.Add($"Error deleted 1 WSOS and {quantityChild} subskill/s.", Severity.Error); }
+                else
+                {
+                    Snackbar.Add($"Error deleted 1 WSOS and {quantityChild} subskill/s.", Severity.Error);
+                }
+                InvokeAsync(RefreshTree);
             }
         }
         else
@@ -148,7 +150,6 @@
             var parameters = new DialogParameters();
             parameters.Add("WSOS", new WSOS());
             var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
-
             var dialog = DialogService.Show<Dialogs.WSOSAddEdit>($"Add new WSOS", parameters, options);
             var result = await dialog.Result;
             RefreshTree();
@@ -184,7 +185,20 @@
     {
         if (SelectedValue == null)
         {
+            Snackbar.Add($"Choose WSOS/subskill.", Severity.Error);
+        }
+        else if (selectedValue.IsWSOS)
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("WSOS", await WSOSService.FindWSOS(selectedValue.Id));
+            var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
+            var dialog = DialogService.Show<Dialogs.WSOSAddEdit>($"Add new WSOS", parameters, options);
+            var result = await dialog.Result;
+            if (!result.Cancelled)
+            {
 
+                RefreshTree();
+            }
         }
         else
         {
@@ -193,7 +207,11 @@
             var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
             var dialog = DialogService.Show<Dialogs.SubSkillAddEdit>($"Update SubSkill to {SelectedValue.Name}", parameters, options);
             var result = await dialog.Result;
-            RefreshTree();
+            if (!result.Cancelled)
+            {
+
+                RefreshTree();
+            }
         }
     }
 

@@ -64,6 +64,10 @@
             result = await WSOSService.CreateWSOS(WSOS);
 
         }
+        else
+        {
+            result = await WSOSService.UpdateWSOS();
+        }
 
         if (result)
         {

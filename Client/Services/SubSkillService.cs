@@ -96,5 +96,20 @@ namespace Client.Services
             quantity += subSkill.InverseParentSubSkill.Count;
             return quantity;
         }
+
+        public async Task<bool> CreateSubSkill(SubSkill subSkill)
+        {
+            try
+            {
+                appDBContext.Add(subSkill);
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+        }
     }
 }

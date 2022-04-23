@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 #nullable disable
 
@@ -17,7 +18,9 @@ namespace Client.Data.Model
         public int Id { get; set; }
         public int? ParentSubSkillId { get; set; }
         public int? WSOSId { get; set; }
+        [Required(ErrorMessage = "Name required")]
         public string Name { get; set; }
+        [Required(ErrorMessage = "Theory required")]
         public string Theory { get; set; }
         public int? Importance { get; set; }
 

@@ -1,0 +1,87 @@
+﻿@using Services
+@using Data
+@using Data.Model
+@inject WSOSService _WSOSService
+@inject NavigationManager UriHelper
+@inject SubSkillService SubSkillService
+@inject ISnackbar Snackbar
+<EditForm Model="@SubSkill" OnValidSubmit="HandleSaveSubSkill">
+    <MudDialog DisableSidePadding="true" Style="padding: 15px">
+
+        <DialogContent>
+
+            <DataAnnotationsValidator />
+            <MudGrid Class="d-flex justify-space-between flex-grow-1 gap-4">
+                <MudItem xs="4">
+
+                    <MudTextField Variant="Variant.Outlined" @bind-Value="SubSkill.Name" For="@(() => SubSkill.Name)" Label="Name" />
+                </MudItem>
+
+                <MudItem class="d-flex align-center">
+                    <MudRating Size="Size.Large" SelectedValue="@SubSkillImportance"></MudRating>
+                </MudItem>
+            </MudGrid>
+            <MudGrid Style="padding: 20px 0 0 0">
+                <MudItem xs="4">
+                    <MudTextField Variant="Variant.Outlined" Lines="25" @bind-Value="SubSkill.Theory" For="@(() => SubSkill.Theory)" Label="Theory" />
+
+                </MudItem>
+                <MudItem xs="8">
+                    <MudField Variant="Variant.Outlined" Label="Theory .md format">
+                        <MudContainer Style="overflow-y: scroll; height: 475px; max-height: 475px;">
+                            <MudMarkdown Value="@SubSkill.Theory" />
+
+                        </MudContainer>
+
+                    </MudField>
+
+                </MudItem>
+            </MudGrid>
+
+
+
+
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="MudDialog.Cancel">Cancel</MudButton>
+            <MudButton Color="Color.Primary" ButtonType="ButtonType.Submit" Variant="Variant.Outlined">Save</MudButton>
+
+        </DialogActions>
+
+    </MudDialog>
+</EditForm>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public SubSkill SubSkill { get; set; }
+    public int SubSkillImportance
+    {
+        get
+        {
+            return SubSkill.Importance == null ? 0 : SubSkill.Importance.Value;
+
+        }
+        set
+        {
+            SubSkill.Importance = value;
+        }
+    }
+    private async Task HandleSaveSubSkill(EditContext context)
+    {
+
+
+        var result = await SubSkillService.CreateSubSkill(SubSkill);
+        if (result)
+        {
+            Snackbar.Add($"Successfully saved subskill.", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add($"Don't saved subskill.", Severity.Error);
+        }
+
+        MudDialog.Close();
+
+
+    }
+
+}

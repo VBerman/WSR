@@ -51,7 +51,7 @@
 
                     <div>
                         <h4>Theory</h4>
-                        <MudPaper Style="@($"background:{ Colors.BlueGrey.Lighten4 }")" Class="pt-1 pl-2 pr-2">
+                        <MudPaper Class="pt-1 pl-2 pr-2">
 
                             <MudMarkdown Value="@SelectedSubskill.Theory" />
                         </MudPaper>
@@ -141,10 +141,16 @@
         var options = new DialogOptions() { };
         var dialog = DialogService.Show<Dialogs.TreeCRUD>("Edit tree", parameters, options);
         var result = await dialog.Result;
-        if (!result.Cancelled)
-        {
+        RefreshTree();
+    }
 
-        }
+    private async Task RefreshTree()
+    {
+
+        TreeItems.Clear();
+        TreeItems = await _WSOSService.GetWSOSWithoutNestingAsync();
+        InvokeAsync(StateHasChanged);
+
     }
 
 }

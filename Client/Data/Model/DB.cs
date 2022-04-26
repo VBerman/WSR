@@ -47,6 +47,8 @@ namespace Client.Data.Model
         public virtual DbSet<WSOS> WSOS { get; set; }
         public virtual DbSet<Training> training { get; set; }
 
+        public virtual DbSet<SubSkillCriterion> SubSkillCriteria { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
 
@@ -93,6 +95,18 @@ namespace Client.Data.Model
                     .HasForeignKey(d => d.CountryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_City_Country");
+            });
+
+            modelBuilder.Entity<SubSkillCriterion>(entity =>
+            {
+                entity.ToTable("SubSkillCriterion");
+                entity.HasOne(d => d.SubSkill)
+                    .WithMany(p => p.SubSkillCriteria)
+                    .HasForeignKey(d => d.SubSkillId)
+                    .OnDelete(DeleteBehavior.ClientCascade)
+                    .HasConstraintName("FK_SubSkillCritetion_SubSkill");
+                    
+
             });
 
             modelBuilder.Entity<Country>(entity =>
@@ -282,12 +296,14 @@ namespace Client.Data.Model
                 entity.HasOne(d => d.ParentSubSkill)
                     .WithMany(p => p.InverseParentSubSkill)
                     .HasForeignKey(d => d.ParentSubSkillId)
-                    .HasConstraintName("FK_SubSkill_SubSkill");
+                    .HasConstraintName("FK_SubSkill_SubSkill")
+                    .OnDelete(DeleteBehavior.ClientSetNull);
 
                 entity.HasOne(d => d.WSOS)
                     .WithMany(p => p.SubSkills)
                     .HasForeignKey(d => d.WSOSId)
-                    .HasConstraintName("FK_SubSkill_WSOS");
+                    .HasConstraintName("FK_SubSkill_WSOS")
+                    .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
             modelBuilder.Entity<SubSkillMark>(entity =>

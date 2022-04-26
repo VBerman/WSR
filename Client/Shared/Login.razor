@@ -3,7 +3,7 @@
 @inject Services.IAuthService AuthService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider ApiAuthenticationStateProvider
-
+@inject ISnackbar Snackbar
 @attribute [AllowAnonymous]
 
 <div class="d-flex align-items-center justify-content-center ">
@@ -44,7 +44,11 @@
 
         if (result.Successful)
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/", forceLoad: true);
+        }
+        else
+        {
+            Snackbar.Add($"Error auth", Severity.Error);
         }
 
     }

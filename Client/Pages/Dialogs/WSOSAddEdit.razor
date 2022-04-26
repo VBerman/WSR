@@ -1,0 +1,86 @@
+﻿@using Services
+@using Data.Model
+@inject ISnackbar Snackbar
+@inject SkillService SkillService
+@inject WSOSService WSOSService
+<EditForm Model="@WSOS" OnValidSubmit="HandleSaveWSOS">
+    <MudDialog>
+
+        <DialogContent>
+
+            <DataAnnotationsValidator />
+
+            <MudGrid>
+                <MudItem xs="4">
+                    <MudTextField Variant="Variant.Outlined" @bind-Value="WSOS.SectionName" Label="Section name" For="@(() => WSOS.SectionName)"></MudTextField>
+
+                </MudItem>
+                <MudItem xs="6">
+                    <MudSelect T="Skill" Variant="Variant.Outlined" @bind-Value="WSOS.SkillCodeNavigation" ToStringFunc="Converter" For="@(() => WSOS.SkillCodeNavigation)" Clearable="true" Label="Skill">
+                        @foreach (var item in Skills)
+                        {
+                            <MudSelectItem Value="item" />
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="2">
+                    <MudNumericField  Variant="Variant.Outlined" @bind-Value="WSOS.SectionNumber" For="@(() => WSOS.SectionNumber)" Label="Section number" HideSpinButtons="true"/>
+
+                </MudItem>
+            </MudGrid>
+
+
+
+
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="MudDialog.Cancel">Cancel</MudButton>
+            <MudButton Color="Color.Primary" ButtonType="ButtonType.Submit" Variant="Variant.Outlined">Save</MudButton>
+
+        </DialogActions>
+
+    </MudDialog>
+</EditForm>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public WSOS WSOS { get; set; }
+
+    public Skill SelectedSkill { get; set; }
+
+    public HashSet<Skill> Skills { get; set; } = new HashSet<Skill>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Skills = await SkillService.GetSkills();
+    }
+
+
+    private async Task HandleSaveWSOS(EditContext context)
+    {
+        var result = false;
+        if (WSOS.Id == 0)
+        {
+            result = await WSOSService.CreateWSOS(WSOS);
+
+        }
+        else
+        {
+            result = await WSOSService.UpdateWSOS();
+        }
+
+        if (result)
+        {
+            Snackbar.Add($"Successfully saved WSOS.", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add($"Don't saved WSOS.", Severity.Error);
+        }
+
+        MudDialog.Close();
+    }
+
+    public Func<Skill, string> Converter = p => p?.Name;
+
+}

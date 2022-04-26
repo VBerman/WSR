@@ -1,0 +1,271 @@
+﻿@using Services
+@using Data
+@using Data.Model
+@inject WSOSService WSOSService
+@inject NavigationManager UriHelper
+@inject SubSkillService SubSkillService
+@inject ISnackbar Snackbar
+<MudPaper>
+
+    <MudContainer>
+
+        <MudToolBar>
+            <MudIconButton OnClick="Create" Icon="@Icons.Material.Outlined.Add" />
+            <MudIconButton OnClick="Update" Icon="@Icons.Material.Outlined.Edit" />
+            <MudIconButton OnClick="Move" Icon="@Icons.Material.Outlined.ArrowCircleUp" />
+            <MudSpacer />
+            <MudIconButton OnClick="Delete" Icon="@Icons.Material.Outlined.Delete" Color="Color.Inherit" />
+        </MudToolBar>
+        <MudDialog>
+            <DialogContent>
+                <MudTreeView @ref="TreeView" MaxHeight="70vh" @bind-SelectedValue="SelectedValue" @bind-SelectedValues="SelectedValues" MultiSelection="true" ServerData="SubSkillService.LoadSubSkillsData" Items="TreeItems" CanHover="true">
+                    <ItemTemplate>
+                        <MudTreeViewItem Style="@context.Style" Value="@context" Text="@context.ViewName" />
+                    </ItemTemplate>
+                </MudTreeView>
+            </DialogContent>
+            <DialogActions>
+                <MudButton OnClick="MudDialog.Cancel">Back</MudButton>
+                @*<MudButton>Save changes</MudButton>*@
+            </DialogActions>
+        </MudDialog>
+    </MudContainer>
+</MudPaper>
+@code {
+
+    public MudTreeView<TreeItem> TreeView { get; set; }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Inject] public IDialogService DialogService { get; set; }
+
+    private TreeItem? selectedValue;
+
+    public TreeItem? SelectedValue
+    {
+        get { return selectedValue; }
+        set
+        {
+            if (value != null)
+            {
+                selectedValue = value;
+
+                InvokeAsync(async () => { SelectedSubskill = await SubSkillService.LoadSubSkillFromTreeItem(value); });
+
+            }
+            selectedValue = value;
+        }
+    }
+
+    private SubSkill? selectedSubskill;
+
+    public SubSkill? SelectedSubskill
+    {
+        get { return selectedSubskill; }
+        set
+        {
+            selectedSubskill = value;
+
+        }
+
+    }
+
+
+
+    public HashSet<TreeItem> SelectedValues = new HashSet<TreeItem>();
+
+
+    [Parameter] public HashSet<TreeItem> TreeItems { get; set; }
+
+    private async Task Delete()
+    {
+        if (SelectedValue == null)
+        {
+            Snackbar.Add($"Choose WSOS/subskill.", Severity.Error);
+        }
+        else if (SelectedValue.IsWSOS)
+        {
+
+            var quantityChild = await WSOSService.QuantityChildSubSkills(SelectedValue.Id);
+            bool? result = await DialogService.ShowMessageBox(
+                "Warning",
+                $"U will delete 1 WSOS and {quantityChild} subskill/s, are u wanna it?",
+                yesText: "Delete!",
+                noText: "NO PLZ");
+            if (result == true)
+            {
+                result = await WSOSService.RecursionDeleteWSOS(SelectedValue.Id);
+                if (result == true)
+                {
+                    Snackbar.Add($"Successfully deleted 1 WSOS and {quantityChild} subskill/s.", Severity.Success);
+                }
+                else
+                {
+                    Snackbar.Add($"Error deleted 1 WSOS and {quantityChild} subskill/s.", Severity.Error);
+                }
+                InvokeAsync(RefreshTree);
+            }
+        }
+        else
+        {
+
+            var quantityChild = await SubSkillService.QuantityChildSubSkills(SelectedSubskill) + 1;
+            bool? result = await DialogService.ShowMessageBox(
+                "Warning",
+                $"U will delete {quantityChild} subskill/s, are u wanna it?",
+                yesText: "Delete!",
+                noText: "NO PLZ");
+            if (result == true)
+            {
+                result = await SubSkillService.DeleteSubSkill(SelectedSubskill);
+
+                if (result == true)
+                {
+                    Snackbar.Add($"Successfully deleted {quantityChild} subskill/s.", Severity.Success);
+                    InvokeAsync(RefreshTree);
+
+                }
+                else { Snackbar.Add($"Error deleted {quantityChild} subskill/s.", Severity.Error); }
+            }
+
+        }
+
+
+    }
+
+    private async Task RefreshTree()
+    {
+        // TODO: it's like a magic
+        TreeItems.Clear();
+        TreeItems = await WSOSService.GetWSOSWithoutNestingAsync();
+        InvokeAsync(StateHasChanged);
+
+    }
+
+    private async Task Create()
+    {
+        if (SelectedValue == null)
+        {
+
+            var parameters = new DialogParameters();
+            parameters.Add("WSOS", new WSOS());
+            var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
+            var dialog = DialogService.Show<Dialogs.WSOSAddEdit>($"Add new WSOS", parameters, options);
+            var result = await dialog.Result;
+            RefreshTree();
+
+        }
+        else
+        {
+
+            var parameters = new DialogParameters();
+            var newSubSkill = new SubSkill();
+            if (SelectedValue.IsWSOS)
+            {
+                newSubSkill.WSOSId = SelectedValue.Id;
+            }
+            else
+            {
+                newSubSkill.ParentSubSkillId = SelectedValue.Id;
+            }
+
+            parameters.Add("SubSkill", newSubSkill);
+            var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
+            var dialog = DialogService.Show<Dialogs.SubSkillAddEdit>($"Add SubSkill to {SelectedValue.Name}", parameters, options);
+            var result = await dialog.Result;
+            if (!result.Cancelled)
+            {
+                InvokeAsync(RefreshTree);
+            }
+        }
+
+
+    }
+    private async Task Update()
+    {
+        if (SelectedValue == null)
+        {
+            Snackbar.Add($"Choose WSOS/subskill.", Severity.Error);
+        }
+        else if (selectedValue.IsWSOS)
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("WSOS", await WSOSService.FindWSOS(selectedValue.Id));
+            var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
+            var dialog = DialogService.Show<Dialogs.WSOSAddEdit>($"Add new WSOS", parameters, options);
+            var result = await dialog.Result;
+            if (!result.Cancelled)
+            {
+
+                RefreshTree();
+            }
+        }
+        else
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("SubSkill", SelectedSubskill);
+            var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
+            var dialog = DialogService.Show<Dialogs.SubSkillAddEdit>($"Update SubSkill to {SelectedValue.Name}", parameters, options);
+            var result = await dialog.Result;
+            if (!result.Cancelled)
+            {
+
+                RefreshTree();
+            }
+        }
+    }
+
+    private async Task Move()
+    {
+        if (SelectedValue == null)
+        {
+            Snackbar.Add($"Select tree item", Severity.Error);
+        }
+        else if (SelectedValues.Count == 0)
+        {
+            Snackbar.Add($"Choose tree item/s", Severity.Error);
+        }
+        else if (SelectedValue.IsWSOS)
+        {
+            foreach (var item in SelectedValues)
+            {
+                var subSkill = await SubSkillService.LoadSubSkillFromTreeItem(item);
+                subSkill.WSOSId = SelectedValue.Id;
+                subSkill.ParentSubSkillId = null;
+
+            }
+            var result = await SubSkillService.UpdateSubSkill();
+            if (result)
+            {
+                Snackbar.Add($"Successfully move subskill/s.", Severity.Success);
+                RefreshTree();
+
+            }
+            else
+            {
+                Snackbar.Add($"Error move subskills", Severity.Error);
+            }
+        }
+        else
+        {
+            foreach (var item in SelectedValues)
+            {
+                var subSkill = await SubSkillService.LoadSubSkillFromTreeItem(item);
+                subSkill.ParentSubSkillId = SelectedValue.Id;
+                subSkill.WSOSId = null;
+
+            }
+            var result = await SubSkillService.UpdateSubSkill();
+            if (result)
+            {
+                Snackbar.Add($"Successfully move subskill/s.", Severity.Success);
+                RefreshTree();
+
+            }
+            else
+            {
+                Snackbar.Add($"Error move subskills", Severity.Error);
+            }
+        }
+    }
+}

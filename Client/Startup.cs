@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 
 namespace Client
 {
@@ -39,7 +40,10 @@ namespace Client
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddMudServices();
+            services.AddMudServices(config =>
+            {
+                config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
+            });
 
 
 
@@ -50,7 +54,12 @@ namespace Client
             services.AddScoped<IAuthService, AuthService>();
             //services
             services.AddScoped<WSOSService>();
+            services.AddScoped<UserService>();
             services.AddScoped<TaskService>();
+            services.AddScoped<SubSkillService>();
+            services.AddScoped<CriterionService>();
+            services.AddScoped<TaskResolvingService>();
+            services.AddScoped<SkillService>();
             services.AddDbContext<DB>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("PublicServer"))
             );

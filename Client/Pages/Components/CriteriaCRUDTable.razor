@@ -1,0 +1,107 @@
+﻿@using Services
+@using Data.Model
+@using Utils
+@inject UserService UserService
+@inject ISnackbar Snackbar
+@inject CriterionService CriterionService
+<MudTable T="Row<SubSkillCriterion>"
+          Items="@SubSkill.SubSkillCriteria.Select((s, i) => new Row<SubSkillCriterion> { Index = i + 1, Element = s })"
+          @bind-SelectedItem="SelectedItem"
+          Hover="true">
+    <ToolBarContent>
+        <MudGrid>
+            <MudItem>
+                <MudText Typo="Typo.h4">Criteria</MudText>
+            </MudItem>
+            <MudItem>
+                <MudIconButton Icon="@Icons.Outlined.Add" OnClick="(() => AddCriterion())" />
+            </MudItem>
+            <MudItem></MudItem>
+        </MudGrid>
+
+    </ToolBarContent>
+    <HeaderContent>
+
+        <MudTh>#</MudTh>
+        <MudTh>Name</MudTh>
+
+        <MudTh>Description</MudTh>
+        <MudTh>Max mark</MudTh>
+        @if (!IsReadOnly)
+        {
+            <MudTh style="width:135px; text-align:center">Options</MudTh>
+
+        }
+
+    </HeaderContent>
+    <RowTemplate>
+
+        <MudTd DataLabel="#">@context.Index</MudTd>
+        <MudTd DataLabel="Name">@context.Element.Name</MudTd>
+
+        <MudTd DataLabel="Description">
+            <MudTextField ReadOnly="true" Style="margin: 0px 0px 0px 0px" Value="@context.Element.Description" Lines="@(context.Element.Description.Count(c => c == '\n') + 1)" />
+
+        </MudTd>
+        <MudTd DataLabel="Max mark">@context.Element.MaxMark</MudTd>
+        @if (!IsReadOnly)
+        {
+            <MudTd DataLabel="Options">
+                <MudIconButton OnClick="@(() => EditRow(context.Element))" Icon="@Icons.Outlined.Edit"></MudIconButton>
+                <MudIconButton OnClick="@(() => DeleteCriterion(context.Element))" Icon="@Icons.Outlined.Delete"></MudIconButton>
+            </MudTd>
+
+        }
+
+    </RowTemplate>
+
+</MudTable>
+
+@code {
+   
+    [Parameter] public SubSkill SubSkill { get; set; }
+    public Row<SubSkillCriterion> SelectedItem { get; set; }
+
+    public bool IsReadOnly { get; set; }
+    [Inject] IDialogService DialogService { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        IsReadOnly = !(await UserService.HasRole("Trainer"));
+    }
+
+
+    private async Task EditRow(SubSkillCriterion subSkillCriterion)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Criterion", subSkillCriterion);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = DialogService.Show<Dialogs.CriterionAddEdit>($"Edit criterion", parameters, options);
+        var result = await dialog.Result;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task AddCriterion()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Criterion", new SubSkillCriterion() { SubSkill = SubSkill});
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = DialogService.Show<Dialogs.CriterionAddEdit>($"Edit criterion", parameters, options);
+        var result = await dialog.Result;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task DeleteCriterion(SubSkillCriterion subSkillCriterion)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+                "Warning",
+                $"U will delete criterion, are u wanna it?",
+                yesText: "Delete!",
+                noText: "NO PLZ");
+        if (result == true & await CriterionService.DeleteCriterion(subSkillCriterion.Id))
+        {
+            Snackbar.Add($"Successfully delete criterion.", Severity.Success);
+        }
+        else { Snackbar.Add($"Error delete criterion.", Severity.Error); }
+    }
+
+}

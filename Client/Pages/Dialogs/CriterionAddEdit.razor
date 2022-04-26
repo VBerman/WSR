@@ -1,0 +1,47 @@
+﻿@using Services
+@using Data.Model
+@inject ISnackbar Snackbar
+@inject CriterionService CriterionService
+<EditForm Model="@Criterion" OnValidSubmit="HandleSaveCriterion">
+    <MudDialog DisableSidePadding="true" Style="padding: 15px">
+
+        <DialogContent>
+
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="4">
+
+                    <MudTextField Variant="Variant.Outlined" @bind-Value="Criterion.Name" For="@(() => Criterion.Name)" Label="Name" />
+
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField Variant="Variant.Outlined" @bind-Value="Criterion.Description" Lines="4" For="@(() => Criterion.Description)" Label="Description" />
+                </MudItem>
+                <MudItem xs="2">
+                    <MudNumericField Min="0" Max="100" @bind-Value="Criterion.MaxMark" T="decimal" Variant="Variant.Outlined" Label="Max mark"/>
+                </MudItem>
+
+
+            </MudGrid>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="MudDialog.Cancel">Cancel</MudButton>
+            <MudButton Color="Color.Primary" ButtonType="ButtonType.Submit" Variant="Variant.Outlined">Save</MudButton>
+
+        </DialogActions>
+
+    </MudDialog>
+</EditForm>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public SubSkillCriterion Criterion { get; set; }
+    //TODO: create dialog form by parameters
+    private async Task HandleSaveCriterion(EditContext context)
+    {
+        var result =  Criterion.Id == 0 ? await CriterionService.CreateCritetion(Criterion) : await CriterionService.UpdateCritetion();
+        if (result) { Snackbar.Add($"Successfully saved criterion.", Severity.Success); }
+        else { Snackbar.Add($"Error saved criterion.", Severity.Error); }
+        MudDialog.Close();
+
+    }
+}

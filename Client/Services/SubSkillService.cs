@@ -17,7 +17,7 @@ namespace Client.Services
             this.appDBContext = appDBContext;
         }
 
-        public async Task<HashSet<TreeItem>> LoadSubskillsData(TreeItem treeItem)
+        public async Task<HashSet<TreeItem>> LoadSubSkillsData(TreeItem treeItem)
         {
 
             if (treeItem.IsWSOS)
@@ -29,6 +29,7 @@ namespace Client.Services
                                 Name = s.Name,
                                 Id = s.Id,
                                 IsWSOS = false,
+                                //HasChild = appDBContext.SubSkills.Count(a => s.Id == a.ParentSubSkillId) != 0,
                                 ViewNumber = treeItem.ViewNumber + "." + (i + 1).ToString()
                             })
                             .ToHashSet();
@@ -38,16 +39,18 @@ namespace Client.Services
                 var SubSkill = await appDBContext.SubSkills
                                                     .Include(s => s.InverseParentSubSkill)
                                                     .FirstOrDefaultAsync(s => s.Id == treeItem.Id);
-                return SubSkill.InverseParentSubSkill
+                var result = SubSkill.InverseParentSubSkill
                                 .Select((s, i) => new TreeItem()
                                 {
                                     Name = s.Name,
                                     Id = s.Id,
                                     IsWSOS = false,
+                                    // TODO: come up with a simple solution
+                                    //HasChild = appDBContext.SubSkills.Count(a => s.Id == a.ParentSubSkillId) != 0,
                                     ViewNumber = treeItem.ViewNumber + "." + (i + 1).ToString()
                                 })
                                 .ToHashSet();
-
+                return result;
             }
         }
 
@@ -59,8 +62,78 @@ namespace Client.Services
             }
             else
             {
-                var data = await appDBContext.SubSkills.Include(s => s.SubSkillTasks).ThenInclude(ss => ss.Author).AsQueryable().FirstOrDefaultAsync(s => s.Id == treeItem.Id);
+                var data = await appDBContext.SubSkills.Include(s => s.SubSkillTasks).ThenInclude(ss => ss.Author)
+                                                        .Include(s => s.SubSkillCriteria).AsQueryable()
+                                                        .FirstOrDefaultAsync(s => s.Id == treeItem.Id);
                 return data;
+            }
+        }
+
+        public async Task<bool> DeleteSubSkill(SubSkill subSkill)
+        {
+            try
+            {
+                await RecursionDeleteSubSkill(subSkill);
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+        }
+
+        public async Task RecursionDeleteSubSkill(SubSkill subSkill)
+        {
+
+            subSkill = appDBContext.SubSkills.Include(s => s.InverseParentSubSkill).FirstOrDefault(s => s.Id == subSkill.Id);
+
+            foreach (var item in subSkill.InverseParentSubSkill)
+            {
+                await RecursionDeleteSubSkill(item);
+            }
+            appDBContext.SubSkills.Remove(subSkill);
+        }
+
+        public async Task<int> QuantityChildSubSkills(SubSkill subSkill)
+        {
+            var quantity = 0;
+            subSkill = appDBContext.SubSkills.Include(s => s.InverseParentSubSkill).FirstOrDefault(s => s.Id == subSkill.Id);
+            foreach (var item in subSkill.InverseParentSubSkill)
+            {
+                quantity += await QuantityChildSubSkills(item);
+            }
+            quantity += subSkill.InverseParentSubSkill.Count;
+            return quantity;
+        }
+
+        public async Task<bool> CreateSubSkill(SubSkill subSkill)
+        {
+            try
+            {
+                appDBContext.Add(subSkill);
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                appDBContext.ChangeTracker.Clear();
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateSubSkill()
+        {
+            try
+            {
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                appDBContext.ChangeTracker.Clear();
+                return false;
             }
         }
     }

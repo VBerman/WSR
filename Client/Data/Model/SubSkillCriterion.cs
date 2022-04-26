@@ -17,9 +17,7 @@ namespace Client.Data.Model
         [Required, MaxLength(100, ErrorMessage = "Max length 100 symbols")]
         public string Name { get; set; }
 
-        [Required]
-        public bool IsMeas { get; set; }
-        
+
         public string? Description { get; set; }
         [Required]
         public decimal MaxMark { get; set; }

@@ -358,9 +358,6 @@ namespace Client.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsMeas")
-                        .HasColumnType("bit");
-
                     b.Property<decimal>("MaxMark")
                         .HasColumnType("decimal(18,2)");
 
@@ -1032,6 +1029,7 @@ namespace Client.Migrations
                         .WithMany("SubSkillCriteria")
                         .HasForeignKey("SubSkillId")
                         .HasConstraintName("FK_SubSkillCritetion_SubSkill")
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("SubSkill");

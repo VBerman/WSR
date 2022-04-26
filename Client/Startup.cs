@@ -57,6 +57,7 @@ namespace Client
             services.AddScoped<UserService>();
             services.AddScoped<TaskService>();
             services.AddScoped<SubSkillService>();
+            services.AddScoped<CriterionService>();
             services.AddScoped<TaskResolvingService>();
             services.AddScoped<SkillService>();
             services.AddDbContext<DB>(options => 

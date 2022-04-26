@@ -17,6 +17,13 @@ namespace Client.Services
             this.apiAuthenticationStateProvider = apiAuthenticationStateProvider;
 
         }
+
+        public async Task<User> GetUser()
+        {
+            var userId = await GetUserId();
+            return await appDBContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        }
+
         public async Task<int> GetUserId()
         {
             var state = await apiAuthenticationStateProvider.GetAuthenticationStateAsync();

@@ -9,7 +9,6 @@ namespace Client.Data.Model
     {
         public TestProject()
         {
-            SubSkillTasks = new HashSet<SubSkillTask>();
         }
 
         public int Id { get; set; }
@@ -17,6 +16,6 @@ namespace Client.Data.Model
         public DateTime? IssueDate { get; set; }
         public string Country { get; set; }
 
-        public virtual ICollection<SubSkillTask> SubSkillTasks { get; set; }
+
     }
 }

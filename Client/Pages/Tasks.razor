@@ -1,94 +1,99 @@
 ﻿@page "/tasks/{taskId:int}"
+@page "/tasks/create/{subSkillId:int}"
 @using Services
 @using Data.Model
 @inject TaskService TaskService
 @inject TaskResolvingService TaskResolvingService
-
+@inject UserService UserService
+@inject SubSkillService SubSkillService
 @if (SubSkillTask != null)
 {
     <h1> @SubSkillTask.Name Task</h1>
 
+    <EditForm Context="EditFormContext" Model="SubSkillTask">
+        <MudTabs>
+            <MudDivider></MudDivider>
+            <MudGrid>
+                <MudItem md="9">
+                    <MudTabPanel Text="Information">
+                        <div class="pt-3 pl-3">
+                            <h3>Description</h3>
+                            <MudPaper Style="@($"background:{ Colors.BlueGrey.Lighten4 }")" Class="mt-4 pa-3">
 
-    <MudTabs>
-        <MudDivider></MudDivider>
-        <MudGrid>
-            <MudItem md="9">
-                <MudTabPanel Text="Information">
-                    <div class="pt-3 pl-3">
-                        <h3>Description</h3>
-                        <MudPaper Style="@($"background:{ Colors.BlueGrey.Lighten4 }")" Class="mt-4 pa-3">
+                                <MudMarkdown Value="@SubSkillTask.Description" />
+                            </MudPaper>
+                        </div>
 
-                            <MudMarkdown Value="@SubSkillTask.Description" />
-                        </MudPaper>
-                    </div>
+                    </MudTabPanel>
 
-                </MudTabPanel>
+                    <!--<MudTabPanel Text="Test project">
+                        <div class="pt-3 pl-3">
+                            <h3>Project</h3>
+                        </div>
+                    </MudTabPanel>
 
-                <!--<MudTabPanel Text="Test project">
-                    <div class="pt-3 pl-3">
-                        <h3>@SubSkillTask.TestProject.Name Project</h3>
-                    </div>
-                </MudTabPanel>
-
-                <MudTabPanel Text="Comments">
-                    <div class="pt-3 pl-3">-->
-                @*<h3>Comments</h3>*@
-                <!--</div>
-                </MudTabPanel>-->
-            </MudItem>
-            <MudItem md="3" Class="d-flex min-vh-100 mt-4">
-                <MudDivider Vertical="true" FlexItem="true" Class="mr-2" />
-                <MudGrid Class="h-25">
-                    <MudItem md="12">
-                        <MudField Label="Author" ReadOnly="true" Variant="Variant.Text">
-                            <MudLink Underline="Underline.None" Href="#">@SubSkillTask.Author.Login</MudLink>
-                        </MudField>
-
-                    </MudItem>
-                    <MudItem md="12">
-                        <MudField Label="Max score" ReadOnly="true" Variant="Variant.Text">
-                            <MudText>@SubSkillTask.MaxScore</MudText>
-                        </MudField>
-
-                    </MudItem>
-                    <MudItem md="12">
-                        <MudField Label="Attachment path" ReadOnly="true" Variant="Variant.Text">
-                            <MudLink Underline="Underline.None" Href="#">@SubSkillTask.AttachmentPath</MudLink>
-                        </MudField>
-                    </MudItem>
-                    <MudItem md="12">
-                        <MudField Label="SubSkill" ReadOnly="true" Variant="Variant.Text">
-                            <MudText>@SubSkillTask.SubSkill.Name</MudText>
-                        </MudField>
-
-                    </MudItem>
-                    <AuthorizeView Roles="Competitor">
-                        @*add exclude role*@
-
+                    <MudTabPanel Text="Comments">
+                        <div class="pt-3 pl-3">-->
+                    @*<h3>Comments</h3>*@
+                    <!--</div>
+                    </MudTabPanel>-->
+                </MudItem>
+                <MudItem md="3" Class="d-flex min-vh-100 mt-4">
+                    <MudDivider Vertical="true" FlexItem="true" Class="mr-2" />
+                    <MudGrid Class="h-25">
                         <MudItem md="12">
-                            <MudCheckBox @bind-Checked="@IsFullResolving" Disabled="@(TaskResolving != null)" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Small" Color="Color.Primary"></MudCheckBox>
-                        </MudItem>
+                            <MudField Label="Author" ReadOnly="true" Variant="Variant.Text">
+                                <MudLink Underline="Underline.None" Href="#">@SubSkillTask.Author.Login</MudLink>
+                            </MudField>
 
-                        <MudItem md="12" Class="d-flex justify-content-between">
-                            <MudBlazor.MudButton OnClick="StartResolving" Color="Color.Primary" Disabled="@(TaskResolving != null)" Variant="Variant.Filled">Start resolving</MudBlazor.MudButton>
-                            <MudBlazor.MudButton OnClick="EndResolving" Color="Color.Primary" Disabled="@(TaskResolving == null)" Variant="Variant.Filled">End resolving</MudBlazor.MudButton>
                         </MudItem>
-                        @if (TaskResolving != null)
-                        {
-                            <MudItem md="12" Class="d-flex align-center justify-center mud-width-full">
+                        <MudItem md="12">
+                            <MudField Label="Max score" ReadOnly="true" Variant="Variant.Text">
+                                <MudText>@SubSkillTask.MaxScore</MudText>
+                            </MudField>
 
-                                <MudLink Href="@($"resolvingTasks/" + TaskResolving.Id.ToString())" Color="Color.Primary">View resolving</MudLink>
+                        </MudItem>
+                        <MudItem md="12">
+                            <MudField Label="Attachment path" ReadOnly="true" Variant="Variant.Text">
+                                <MudLink Underline="Underline.None" Href="#">@SubSkillTask.AttachmentPath</MudLink>
+                            </MudField>
+                        </MudItem>
+                        <MudItem md="12">
+                            <MudField Label="SubSkill" ReadOnly="true" Variant="Variant.Text">
+                                <MudText>@SubSkillTask.SubSkill.Name</MudText>
+                            </MudField>
+
+                        </MudItem>
+                        <AuthorizeView Roles="Competitor">
+
+
+                            <MudItem md="12">
+                                <MudCheckBox @bind-Checked="@IsFullResolving" Disabled="@(TaskResolving != null)" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Small" Color="Color.Primary"></MudCheckBox>
                             </MudItem>
-                        }
-                    </AuthorizeView>    
-                </MudGrid>
+
+                            <MudItem md="12" Class="d-flex justify-content-between">
+                                <MudBlazor.MudButton OnClick="StartResolving" Color="Color.Primary" Disabled="@(TaskResolving != null)" Variant="Variant.Filled">Start resolving</MudBlazor.MudButton>
+                                <MudBlazor.MudButton OnClick="EndResolving" Color="Color.Primary" Disabled="@(TaskResolving == null)" Variant="Variant.Filled">End resolving</MudBlazor.MudButton>
+                            </MudItem>
+                            @if (TaskResolving != null)
+                            {
+                                <MudItem md="12" Class="d-flex align-center justify-center mud-width-full">
+
+                                    <MudLink Href="@($"resolvingTasks/" + TaskResolving.Id.ToString())" Color="Color.Primary">View resolving</MudLink>
+                                </MudItem>
+                            }
+                        </AuthorizeView>
+                        <AuthorizeView Roles="Trainer" Context="AuthorizeViewContext">
+                            <MudText>Отредайтируй меня полностью</MudText>
+                        </AuthorizeView>
+                    </MudGrid>
 
 
-            </MudItem>
-        </MudGrid>
+                </MudItem>
+            </MudGrid>
 
-    </MudTabs>
-
+        </MudTabs>
+    </EditForm>
 
 
 
@@ -100,13 +105,27 @@ else
 
 @code {
     [Parameter] public int TaskId { get; set; }
+    [Parameter] public int SubSkillId { get; set; }
     public SubSkillTaskResolving? TaskResolving { get; set; }
     public bool IsFullResolving { get; set; }
     public SubSkillTask? SubSkillTask { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        SubSkillTask = await Task.Run(() => TaskService.GetSubSkillTask(TaskId));
+        var hasRole = await UserService.HasRole("Trainer");
+        if (hasRole & TaskId == 0)
+        {
+            var subSkill = await SubSkillService.GetSubSkill(SubSkillId);
+            if (subSkill != null)
+            {
+
+                SubSkillTask = new SubSkillTask() { Author = await UserService.GetUser(), SubSkill = subSkill };
+            }
+        }
+        else
+        {
+            SubSkillTask = await Task.Run(() => TaskService.GetSubSkillTask(TaskId));
+        }
         TaskResolving = await Task.Run(() => TaskResolvingService.CurrentResolvingTask(SubSkillTask));
         if (TaskResolving != null)
         {
@@ -123,7 +142,7 @@ else
     {
         await Task.Run(() => TaskResolvingService.EndTask(TaskResolving));
         TaskResolving = null;
-        
+
     }
 
 }

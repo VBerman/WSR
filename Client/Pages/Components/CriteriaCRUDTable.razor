@@ -13,9 +13,12 @@
             <MudItem>
                 <MudText Typo="Typo.h4">Criteria</MudText>
             </MudItem>
-            <MudItem>
-                <MudIconButton Icon="@Icons.Outlined.Add" OnClick="(() => AddCriterion())" />
-            </MudItem>
+            @if (!IsReadOnly)
+            {
+                <MudItem>
+                    <MudIconButton Icon="@Icons.Outlined.Add" OnClick="(() => AddCriterion())" />
+                </MudItem>
+            }
             <MudItem></MudItem>
         </MudGrid>
 
@@ -58,7 +61,7 @@
 </MudTable>
 
 @code {
-   
+
     [Parameter] public SubSkill SubSkill { get; set; }
     public Row<SubSkillCriterion> SelectedItem { get; set; }
 
@@ -83,7 +86,7 @@
     private async Task AddCriterion()
     {
         var parameters = new DialogParameters();
-        parameters.Add("Criterion", new SubSkillCriterion() { SubSkill = SubSkill});
+        parameters.Add("Criterion", new SubSkillCriterion() { SubSkill = SubSkill });
         var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
         var dialog = DialogService.Show<Dialogs.CriterionAddEdit>($"Edit criterion", parameters, options);
         var result = await dialog.Result;

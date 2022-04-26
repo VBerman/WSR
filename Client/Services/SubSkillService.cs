@@ -1,4 +1,6 @@
-﻿using Client.Data;
+﻿using AutoMapper;
+using Client.Data;
+using Client.Data.DTO;
 using Client.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,10 +13,11 @@ namespace Client.Services
     public class SubSkillService
     {
         private readonly DB appDBContext;
-
-        public SubSkillService(DB appDBContext)
+        private readonly IMapper mapper;
+        public SubSkillService(DB appDBContext, IMapper mapper)
         {
             this.appDBContext = appDBContext;
+            this.mapper = mapper;
         }
 
         public async Task<HashSet<TreeItem>> LoadSubSkillsData(TreeItem treeItem)
@@ -108,8 +111,9 @@ namespace Client.Services
             return quantity;
         }
 
-        public async Task<bool> CreateSubSkill(SubSkill subSkill)
+        public async Task<bool> CreateSubSkill(UpdateSubSkillDto updateSubSkillDto)
         {
+            var subSkill = mapper.Map<SubSkill>(updateSubSkillDto);
             try
             {
                 appDBContext.Add(subSkill);
@@ -123,7 +127,29 @@ namespace Client.Services
             }
         }
 
-        public async Task<bool> UpdateSubSkill()
+        public async Task<bool> UpdateSubSkill(UpdateSubSkillDto updateSubSkillDto)
+        {
+            var oldSubSkill = await appDBContext.SubSkills.AsAsyncEnumerable().FirstOrDefaultAsync(s => s.Id == updateSubSkillDto.Id);
+            mapper.Map(updateSubSkillDto, oldSubSkill);
+            try
+            {
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                appDBContext.ChangeTracker.Clear();
+                return false;
+            }
+        }
+
+        public async Task<SubSkill> GetSubSkill(int id)
+        {
+            var va = await appDBContext.SubSkills.AsAsyncEnumerable().FirstOrDefaultAsync(s => s.Id == id);
+            return va;
+        }
+
+        public async Task<bool> SaveChangesAsync()
         {
             try
             {

@@ -1,10 +1,13 @@
 ﻿@using Services
 @using Data
 @using Data.Model
+@using AutoMapper
+@using Data.DTO
 @inject WSOSService WSOSService
 @inject NavigationManager UriHelper
 @inject SubSkillService SubSkillService
 @inject ISnackbar Snackbar
+@inject IMapper Mapper
 <MudPaper>
 
     <MudContainer>
@@ -169,7 +172,7 @@
                 newSubSkill.ParentSubSkillId = SelectedValue.Id;
             }
 
-            parameters.Add("SubSkill", newSubSkill);
+            parameters.Add("SubSkill", Mapper.Map<UpdateSubSkillDto>(newSubSkill));
             var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
             var dialog = DialogService.Show<Dialogs.SubSkillAddEdit>($"Add SubSkill to {SelectedValue.Name}", parameters, options);
             var result = await dialog.Result;
@@ -203,7 +206,7 @@
         else
         {
             var parameters = new DialogParameters();
-            parameters.Add("SubSkill", SelectedSubskill);
+            parameters.Add("SubSkill", Mapper.Map<UpdateSubSkillDto>(SelectedSubskill));
             var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
             var dialog = DialogService.Show<Dialogs.SubSkillAddEdit>($"Update SubSkill to {SelectedValue.Name}", parameters, options);
             var result = await dialog.Result;
@@ -234,7 +237,7 @@
                 subSkill.ParentSubSkillId = null;
 
             }
-            var result = await SubSkillService.UpdateSubSkill();
+            var result = await SubSkillService.SaveChangesAsync();
             if (result)
             {
                 Snackbar.Add($"Successfully move subskill/s.", Severity.Success);
@@ -255,7 +258,7 @@
                 subSkill.WSOSId = null;
 
             }
-            var result = await SubSkillService.UpdateSubSkill();
+            var result = await SubSkillService.SaveChangesAsync();
             if (result)
             {
                 Snackbar.Add($"Successfully move subskill/s.", Severity.Success);

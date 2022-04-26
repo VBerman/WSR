@@ -24,7 +24,7 @@ namespace Client.Services
         public async Task<SubSkillTask?> GetSubSkillTask(int id)
         {
            
-            var data = await appDBContext.SubSkillTasks.Include(s => s.TestProject).Include(s => s.Author).Include(s => s.SubSkill).FirstOrDefaultAsync(s => s.Id == id);
+            var data = await appDBContext.SubSkillTasks.Include(s => s.Author).Include(s => s.SubSkill).FirstOrDefaultAsync(s => s.Id == id);
             return data;
         }
         

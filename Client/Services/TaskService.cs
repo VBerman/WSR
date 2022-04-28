@@ -28,6 +28,48 @@ namespace Client.Services
             return data;
         }
         
+        public async Task<bool> CreateSubSkillTask(SubSkillTask subSkillTask)
+        {
+            try
+            {
+                await appDBContext.SubSkillTasks.AddAsync(subSkillTask);
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+                
+            }
+        }
 
+        public async Task<bool> UpdateSubSkillTask()
+        {
+            try
+            {
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteSubSkillTask(int id)
+        {
+            try
+            {
+                var task = appDBContext.SubSkillTasks.FirstOrDefault(t => t.Id == id);
+                appDBContext.SubSkillTasks.Remove(task);
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }

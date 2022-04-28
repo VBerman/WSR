@@ -162,5 +162,14 @@ namespace Client.Services
                 return false;
             }
         }
+
+        public async Task<IEnumerable<SubSkill>> SearchContainName(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return await Task.Run(() => appDBContext.SubSkills.ToEnumerable());
+            }
+            return await Task.Run(() => appDBContext.SubSkills.ToEnumerable().Where(s => s.Name.Contains(value)));
+        }
     }
 }

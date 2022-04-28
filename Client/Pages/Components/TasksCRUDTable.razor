@@ -1,0 +1,90 @@
+﻿@using Services
+@using Data.Model
+@using Utils
+@inject NavigationManager UriHelper
+@inject UserService UserService
+@inject ISnackbar Snackbar
+@inject TaskService TaskService
+<MudTable Items="@SubSkill.SubSkillTasks.Select((t, i) => new Row<SubSkillTask> { Index = i + 1, Element = t })"
+          Hover="true"
+          OnRowClick="RowClickEvent"
+          T="Row<SubSkillTask>">
+    <ToolBarContent>
+        <MudGrid>
+            <MudItem>
+                <MudText Typo="Typo.h4">Tasks</MudText>
+            </MudItem>
+            @if (!IsReadOnly)
+            {
+                <MudItem>
+                    <MudIconButton Icon="@Icons.Outlined.Add" OnClick="(() => AddTask())" />
+                </MudItem>
+            }
+            <MudItem></MudItem>
+        </MudGrid>
+
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Author</MudTh>
+        <MudTh>MaxScore</MudTh>
+        @if (!IsReadOnly)
+        {
+            <MudTh>Options</MudTh>
+
+        }
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="#">@context.Index</MudTd>
+        <MudTd DataLabel="Name">@context.Element.Name</MudTd>
+        <MudTd DataLabel="Author">@context.Element.Author.Login</MudTd>
+        <MudTd DataLabel="MaxScore">@context.Element.MaxScore</MudTd>
+        @if (!IsReadOnly)
+        {
+            <MudTd DataLabel="Options">
+                <MudIconButton OnClick="@(() => DeleteTask(context.Element))" Icon="@Icons.Outlined.Delete"></MudIconButton>
+            </MudTd>
+
+        }
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter] public SubSkill SubSkill { get; set; }
+    public Row<SubSkillTask> SelectedItem { get; set; }
+    [Inject] IDialogService DialogService { get; set; }
+
+    public bool IsReadOnly { get; set; }
+
+    private void RowClickEvent(TableRowClickEventArgs<Row<SubSkillTask>> tableRowClickEventArgs)
+    {
+        UriHelper.NavigateTo("tasks/" + tableRowClickEventArgs.Item.Element.Id);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsReadOnly = !(await UserService.HasRole("Trainer"));
+    }
+
+    public void AddTask()
+    {
+        UriHelper.NavigateTo("tasks/create/" + SubSkill.Id);
+
+    }
+
+    public async Task DeleteTask(SubSkillTask subSkillTask)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+                "Warning",
+                $"U will delete task, are u wanna it?",
+                yesText: "Delete!",
+                noText: "NO PLZ");
+        if (result == true & await TaskService.DeleteSubSkillTask(subSkillTask.Id))
+        {
+            Snackbar.Add($"Successfully delete task.", Severity.Success);
+        }
+        else { Snackbar.Add($"Error delete task.", Severity.Error); }
+    }
+
+}

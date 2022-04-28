@@ -50,7 +50,7 @@
         @if (!IsReadOnly)
         {
             <MudTd DataLabel="Options">
-                <MudIconButton OnClick="@(() => EditRow(context.Element))" Icon="@Icons.Outlined.Edit"></MudIconButton>
+                <MudIconButton OnClick="@(() => UpdateCriterion(context.Element))" Icon="@Icons.Outlined.Edit"></MudIconButton>
                 <MudIconButton OnClick="@(() => DeleteCriterion(context.Element))" Icon="@Icons.Outlined.Delete"></MudIconButton>
             </MudTd>
 
@@ -73,7 +73,7 @@
     }
 
 
-    private async Task EditRow(SubSkillCriterion subSkillCriterion)
+    private async Task UpdateCriterion(SubSkillCriterion subSkillCriterion)
     {
         var parameters = new DialogParameters();
         parameters.Add("Criterion", subSkillCriterion);

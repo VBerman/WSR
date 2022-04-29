@@ -2,6 +2,7 @@
 @using Data.Model
 @using Services
 @using Data
+@using Data.ViewModel
 @inject WSOSService WSOSService
 @inject NavigationManager UriHelper
 @inject SubSkillService SubSkillService
@@ -101,7 +102,7 @@
         set
         {
             selectedSubskill = value;
-            StateHasChanged();
+            InvokeAsync(StateHasChanged);
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿@using Services
 @using Data.Model
+@using Extensions
 @inject ISnackbar Snackbar
 @inject CriterionService CriterionService
 <EditForm Model="@Criterion" OnValidSubmit="HandleSaveCriterion">
@@ -35,12 +36,11 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public SubSkillCriterion Criterion { get; set; }
-    //TODO: create dialog form by parameters
     private async Task HandleSaveCriterion(EditContext context)
     {
+
         var result =  Criterion.Id == 0 ? await CriterionService.CreateCritetion(Criterion) : await CriterionService.UpdateCritetion();
-        if (result) { Snackbar.Add($"Successfully saved criterion.", Severity.Success); }
-        else { Snackbar.Add($"Error saved criterion.", Severity.Error); }
+        Snackbar.Report(result, "saved criterion.");
         MudDialog.Close();
 
     }

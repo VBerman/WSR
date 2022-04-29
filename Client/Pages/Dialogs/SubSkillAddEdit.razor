@@ -4,7 +4,7 @@
 @inject WSOSService _WSOSService
 @inject SubSkillService SubSkillService
 @inject ISnackbar Snackbar
-
+@using Extensions
 <EditForm Model="@SubSkill" OnValidSubmit="HandleSaveSubSkill">
     <MudDialog DisableSidePadding="true" Style="padding: 15px">
 
@@ -58,7 +58,6 @@
         get
         {
             return SubSkill.Importance == null ? 0 : SubSkill.Importance.Value;
-
         }
         set
         {
@@ -78,15 +77,8 @@
             result = await SubSkillService.UpdateSubSkill(SubSkill);
         }
 
-        if (result)
-        {
-            Snackbar.Add($"Successfully saved subskill.", Severity.Success);
-        }
-        else
-        {
-            Snackbar.Add($"Don't saved subskill.", Severity.Error);
-        }
-
+        Snackbar.Report(result, "Successfully saved subskill.");
+        
         MudDialog.Close();
 
 

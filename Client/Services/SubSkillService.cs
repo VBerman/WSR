@@ -2,6 +2,7 @@
 using Client.Data;
 using Client.Data.DTO;
 using Client.Data.Model;
+using Client.Data.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -48,8 +49,6 @@ namespace Client.Services
                                     Name = s.Name,
                                     Id = s.Id,
                                     IsWSOS = false,
-                                    // TODO: come up with a simple solution
-                                    //HasChild = appDBContext.SubSkills.Count(a => s.Id == a.ParentSubSkillId) != 0,
                                     ViewNumber = treeItem.ViewNumber + "." + (i + 1).ToString()
                                 })
                                 .ToHashSet();
@@ -170,6 +169,11 @@ namespace Client.Services
                 return await Task.Run(() => appDBContext.SubSkills.ToEnumerable());
             }
             return await Task.Run(() => appDBContext.SubSkills.ToEnumerable().Where(s => s.Name.Contains(value)));
+        }
+
+        public async Task<IEnumerable<SubSkill>> GetAllSubSkills()
+        {
+            return await Task.Run(() => appDBContext.SubSkills.ToEnumerable());
         }
     }
 }

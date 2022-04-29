@@ -1,6 +1,7 @@
 ﻿@using Services
 @using Data.Model
-@using Utils
+@using Data.ViewModel
+@using Extensions
 @inject NavigationManager UriHelper
 @inject UserService UserService
 @inject ISnackbar Snackbar
@@ -75,16 +76,9 @@
 
     public async Task DeleteTask(SubSkillTask subSkillTask)
     {
-        bool? result = await DialogService.ShowMessageBox(
-                "Warning",
-                $"U will delete task, are u wanna it?",
-                yesText: "Delete!",
-                noText: "NO PLZ");
-        if (result == true & await TaskService.DeleteSubSkillTask(subSkillTask.Id))
-        {
-            Snackbar.Add($"Successfully delete task.", Severity.Success);
-        }
-        else { Snackbar.Add($"Error delete task.", Severity.Error); }
+        bool? result = await DialogService.Warning("U will delete task, are u wanna it?") & await TaskService.DeleteSubSkillTask(subSkillTask.Id);
+        Snackbar.Report(result, "delete task.");
+       
     }
 
 }

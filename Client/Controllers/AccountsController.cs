@@ -1,4 +1,4 @@
-﻿using AIS.Server.Utils;
+﻿using Client.Extensions;
 using Client.Data.Auth;
 using Client.Data.Model;
 using Microsoft.AspNetCore.Authorization;

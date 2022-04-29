@@ -6,6 +6,8 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Client.Services;
+using Client.Data.ViewModel;
+
 namespace Client.Services
 {
     public class WSOSService

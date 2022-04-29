@@ -1,8 +1,9 @@
 ﻿@using Services
-@using Data
+@using Extensions
 @using Data.Model
 @using AutoMapper
 @using Data.DTO
+@using Data.ViewModel
 @inject WSOSService WSOSService
 @inject NavigationManager UriHelper
 @inject SubSkillService SubSkillService
@@ -90,22 +91,11 @@
         {
 
             var quantityChild = await WSOSService.QuantityChildSubSkills(SelectedValue.Id);
-            bool? result = await DialogService.ShowMessageBox(
-                "Warning",
-                $"U will delete 1 WSOS and {quantityChild} subskill/s, are u wanna it?",
-                yesText: "Delete!",
-                noText: "NO PLZ");
+            bool? result = await DialogService.Warning($"U will delete 1 WSOS and {quantityChild} subskill/s, are u wanna it?");
             if (result == true)
             {
                 result = await WSOSService.RecursionDeleteWSOS(SelectedValue.Id);
-                if (result == true)
-                {
-                    Snackbar.Add($"Successfully deleted 1 WSOS and {quantityChild} subskill/s.", Severity.Success);
-                }
-                else
-                {
-                    Snackbar.Add($"Error deleted 1 WSOS and {quantityChild} subskill/s.", Severity.Error);
-                }
+                Snackbar.Report(result, "deleted 1 WSOS and {quantityChild} subskill/s.");
                 InvokeAsync(RefreshTree);
             }
         }
@@ -113,11 +103,7 @@
         {
 
             var quantityChild = await SubSkillService.QuantityChildSubSkills(SelectedSubskill) + 1;
-            bool? result = await DialogService.ShowMessageBox(
-                "Warning",
-                $"U will delete {quantityChild} subskill/s, are u wanna it?",
-                yesText: "Delete!",
-                noText: "NO PLZ");
+            bool? result = await DialogService.Warning($"U will delete {quantityChild} subskill/s, are u wanna it?");
             if (result == true)
             {
                 result = await SubSkillService.DeleteSubSkill(SelectedSubskill);

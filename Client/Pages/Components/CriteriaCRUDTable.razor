@@ -1,6 +1,7 @@
 ﻿@using Services
 @using Data.Model
-@using Utils
+@using Data.ViewModel
+@using Extensions
 @inject UserService UserService
 @inject ISnackbar Snackbar
 @inject CriterionService CriterionService
@@ -95,16 +96,10 @@
 
     private async Task DeleteCriterion(SubSkillCriterion subSkillCriterion)
     {
-        bool? result = await DialogService.ShowMessageBox(
-                "Warning",
-                $"U will delete criterion, are u wanna it?",
-                yesText: "Delete!",
-                noText: "NO PLZ");
-        if (result == true & await CriterionService.DeleteCriterion(subSkillCriterion.Id))
-        {
-            Snackbar.Add($"Successfully delete criterion.", Severity.Success);
-        }
-        else { Snackbar.Add($"Error delete criterion.", Severity.Error); }
+        bool? result = await DialogService.Warning("A u wanna delete criterion?") & await CriterionService.DeleteCriterion(subSkillCriterion.Id);
+        Snackbar.Report(result, "delete criterion");
+        
+        
     }
 
 }

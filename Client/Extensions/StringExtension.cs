@@ -5,9 +5,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AIS.Server.Utils
+namespace Client.Extensions
 {
-    public static class MD5UtilExtension
+    public static class StringExtension
     {
         public static string ToMD5Hash(this string str) {
             if (string.IsNullOrEmpty(str)) {

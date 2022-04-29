@@ -2,11 +2,12 @@
 @using Data.Model
 @using Services
 @using Data
+@using Data.ViewModel
 @inject WSOSService WSOSService
 @inject NavigationManager UriHelper
 @inject SubSkillService SubSkillService
 @inject IDialogService DialogService
-@inject UserService UserService 
+@inject UserService UserService
 <h1>WSOS skill training</h1>
 <MudDivider />
 
@@ -56,30 +57,11 @@
                         </MudPaper>
                     </div>
                 }
-                @if (selectedSubskill.SubSkillTasks.Count != 0)
-                {
 
-                    <div>
-                        <h4>Tasks</h4>
-                        <MudTable Items="@SelectedSubskill.SubSkillTasks" Hover="true" OnRowClick="RowClickEvent" T="SubSkillTask">
-                            <HeaderContent>
-                                <MudTh>Name</MudTh>
-                                <MudTh>Author</MudTh>
-                                <MudTh>MaxScore</MudTh>
-                            </HeaderContent>
-                            <RowTemplate>
-                                <MudTd DataLabel="Name">@context.Name</MudTd>
-                                <MudTd DataLabel="Author">@context.Author.Login</MudTd>
-                                <MudTd DataLabel="MaxScore">@context.MaxScore</MudTd>
-                            </RowTemplate>
-                        </MudTable>
-                    </div>
-                }
-                <div>
-                    
-                    <CriteriaCRUDTable SubSkill="@SelectedSubskill"></CriteriaCRUDTable>
-                    
-                </div>
+
+                <TasksCRUDTable SubSkill="@SelectedSubskill" />
+                <CriteriaCRUDTable SubSkill="@SelectedSubskill" />
+
             </div>
 
 
@@ -120,7 +102,7 @@
         set
         {
             selectedSubskill = value;
-            StateHasChanged();
+            InvokeAsync(StateHasChanged);
         }
     }
 
@@ -132,10 +114,7 @@
         TreeItems = await WSOSService.GetWSOSWithoutNestingAsync();
     }
 
-    private void RowClickEvent(TableRowClickEventArgs<SubSkillTask> tableRowClickEventArgs)
-    {
-        UriHelper.NavigateTo("tasks/" + tableRowClickEventArgs.Item.Id);
-    }
+
 
     private async Task EditTree()
     {
@@ -156,5 +135,5 @@
 
     }
 
-    
+
 }

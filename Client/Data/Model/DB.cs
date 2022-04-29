@@ -349,11 +349,7 @@ namespace Client.Data.Model
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_SubSkillTask_SubSkill");
 
-                entity.HasOne(d => d.TestProject)
-                    .WithMany(p => p.SubSkillTasks)
-                    .HasForeignKey(d => d.TestProjectId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_SubSkillTask_TestProject");
+                
             });
 
             modelBuilder.Entity<SubSkillTaskResolving>(entity =>

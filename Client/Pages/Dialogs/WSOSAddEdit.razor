@@ -1,5 +1,6 @@
 ﻿@using Services
 @using Data.Model
+@using Extensions
 @inject ISnackbar Snackbar
 @inject SkillService SkillService
 @inject WSOSService WSOSService
@@ -69,14 +70,7 @@
             result = await WSOSService.UpdateWSOS();
         }
 
-        if (result)
-        {
-            Snackbar.Add($"Successfully saved WSOS.", Severity.Success);
-        }
-        else
-        {
-            Snackbar.Add($"Don't saved WSOS.", Severity.Error);
-        }
+        Snackbar.Report(result, "saved WSOS.");
 
         MudDialog.Close();
     }

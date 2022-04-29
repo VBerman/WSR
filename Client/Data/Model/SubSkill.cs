@@ -21,7 +21,7 @@ namespace Client.Data.Model
         public int? WSOSId { get; set; }
         [Required(ErrorMessage = "Name required")]
         public string Name { get; set; }
-        [Required(ErrorMessage = "Theory required")]
+
         public string Theory { get; set; }
         public int? Importance { get; set; }
 

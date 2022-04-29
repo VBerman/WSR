@@ -22,6 +22,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
+using System.Reflection;
 
 namespace Client
 {
@@ -63,7 +64,7 @@ namespace Client
             services.AddDbContext<DB>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("PublicServer"))
             );
-
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
             // server auth
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

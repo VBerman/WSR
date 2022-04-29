@@ -1,8 +1,10 @@
 ﻿@using Services
 @using Data.Model
+@using Data.DTO
 @inject WSOSService _WSOSService
 @inject SubSkillService SubSkillService
 @inject ISnackbar Snackbar
+@using Extensions
 <EditForm Model="@SubSkill" OnValidSubmit="HandleSaveSubSkill">
     <MudDialog DisableSidePadding="true" Style="padding: 15px">
 
@@ -21,7 +23,7 @@
             </MudGrid>
             <MudGrid Style="padding: 20px 0 0 0">
                 <MudItem xs="4">
-                    <MudTextField Variant="Variant.Outlined" Lines="25" @bind-Value="SubSkill.Theory" For="@(() => SubSkill.Theory)" Label="Theory" />
+                    <MudTextField Variant="Variant.Outlined" Lines="25" @bind-Value="SubSkill.Theory"  For="@(() => SubSkill.Theory)" Label="Theory" />
 
                 </MudItem>
                 <MudItem xs="8">
@@ -50,13 +52,12 @@
 </EditForm>
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public SubSkill SubSkill { get; set; }
+    [Parameter] public UpdateSubSkillDto SubSkill { get; set; }
     public int SubSkillImportance
     {
         get
         {
             return SubSkill.Importance == null ? 0 : SubSkill.Importance.Value;
-
         }
         set
         {
@@ -73,18 +74,11 @@
         }
         else
         {
-            result = await SubSkillService.UpdateSubSkill();
+            result = await SubSkillService.UpdateSubSkill(SubSkill);
         }
 
-        if (result)
-        {
-            Snackbar.Add($"Successfully saved subskill.", Severity.Success);
-        }
-        else
-        {
-            Snackbar.Add($"Don't saved subskill.", Severity.Error);
-        }
-
+        Snackbar.Report(result, "Successfully saved subskill.");
+        
         MudDialog.Close();
 
 

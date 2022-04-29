@@ -1,5 +1,6 @@
 ﻿
 @page "/login"
+@using Extensions 
 @inject Services.IAuthService AuthService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider ApiAuthenticationStateProvider
@@ -48,7 +49,7 @@
         }
         else
         {
-            Snackbar.Add($"Error auth", Severity.Error);
+            Snackbar.Report(false, $"auth");
         }
 
     }

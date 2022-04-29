@@ -436,16 +436,11 @@ namespace Client.Migrations
                     b.Property<int>("SubSkilId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TestProjectId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("SubSkilId");
-
-                    b.HasIndex("TestProjectId");
 
                     b.ToTable("SubSkillTask");
                 });
@@ -1068,17 +1063,9 @@ namespace Client.Migrations
                         .HasConstraintName("FK_SubSkillTask_SubSkill")
                         .IsRequired();
 
-                    b.HasOne("Client.Data.Model.TestProject", "TestProject")
-                        .WithMany("SubSkillTasks")
-                        .HasForeignKey("TestProjectId")
-                        .HasConstraintName("FK_SubSkillTask_TestProject")
-                        .IsRequired();
-
                     b.Navigation("Author");
 
                     b.Navigation("SubSkill");
-
-                    b.Navigation("TestProject");
                 });
 
             modelBuilder.Entity("Client.Data.Model.SubSkillTaskResolving", b =>
@@ -1337,11 +1324,6 @@ namespace Client.Migrations
             modelBuilder.Entity("Client.Data.Model.SubSkillTask", b =>
                 {
                     b.Navigation("SubSkillTaskResolvings");
-                });
-
-            modelBuilder.Entity("Client.Data.Model.TestProject", b =>
-                {
-                    b.Navigation("SubSkillTasks");
                 });
 
             modelBuilder.Entity("Client.Data.Model.Training", b =>

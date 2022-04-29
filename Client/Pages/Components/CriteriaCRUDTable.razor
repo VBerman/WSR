@@ -1,6 +1,7 @@
 ﻿@using Services
 @using Data.Model
-@using Utils
+@using Data.ViewModel
+@using Extensions
 @inject UserService UserService
 @inject ISnackbar Snackbar
 @inject CriterionService CriterionService
@@ -13,9 +14,12 @@
             <MudItem>
                 <MudText Typo="Typo.h4">Criteria</MudText>
             </MudItem>
-            <MudItem>
-                <MudIconButton Icon="@Icons.Outlined.Add" OnClick="(() => AddCriterion())" />
-            </MudItem>
+            @if (!IsReadOnly)
+            {
+                <MudItem>
+                    <MudIconButton Icon="@Icons.Outlined.Add" OnClick="(() => AddCriterion())" />
+                </MudItem>
+            }
             <MudItem></MudItem>
         </MudGrid>
 
@@ -47,7 +51,7 @@
         @if (!IsReadOnly)
         {
             <MudTd DataLabel="Options">
-                <MudIconButton OnClick="@(() => EditRow(context.Element))" Icon="@Icons.Outlined.Edit"></MudIconButton>
+                <MudIconButton OnClick="@(() => UpdateCriterion(context.Element))" Icon="@Icons.Outlined.Edit"></MudIconButton>
                 <MudIconButton OnClick="@(() => DeleteCriterion(context.Element))" Icon="@Icons.Outlined.Delete"></MudIconButton>
             </MudTd>
 
@@ -58,7 +62,7 @@
 </MudTable>
 
 @code {
-   
+
     [Parameter] public SubSkill SubSkill { get; set; }
     public Row<SubSkillCriterion> SelectedItem { get; set; }
 
@@ -70,7 +74,7 @@
     }
 
 
-    private async Task EditRow(SubSkillCriterion subSkillCriterion)
+    private async Task UpdateCriterion(SubSkillCriterion subSkillCriterion)
     {
         var parameters = new DialogParameters();
         parameters.Add("Criterion", subSkillCriterion);
@@ -83,7 +87,7 @@
     private async Task AddCriterion()
     {
         var parameters = new DialogParameters();
-        parameters.Add("Criterion", new SubSkillCriterion() { SubSkill = SubSkill});
+        parameters.Add("Criterion", new SubSkillCriterion() { SubSkill = SubSkill });
         var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
         var dialog = DialogService.Show<Dialogs.CriterionAddEdit>($"Edit criterion", parameters, options);
         var result = await dialog.Result;
@@ -92,16 +96,10 @@
 
     private async Task DeleteCriterion(SubSkillCriterion subSkillCriterion)
     {
-        bool? result = await DialogService.ShowMessageBox(
-                "Warning",
-                $"U will delete criterion, are u wanna it?",
-                yesText: "Delete!",
-                noText: "NO PLZ");
-        if (result == true & await CriterionService.DeleteCriterion(subSkillCriterion.Id))
-        {
-            Snackbar.Add($"Successfully delete criterion.", Severity.Success);
-        }
-        else { Snackbar.Add($"Error delete criterion.", Severity.Error); }
+        bool? result = await DialogService.Warning("A u wanna delete criterion?") & await CriterionService.DeleteCriterion(subSkillCriterion.Id);
+        Snackbar.Report(result, "delete criterion");
+        
+        
     }
 
 }

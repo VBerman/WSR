@@ -8,7 +8,7 @@ namespace Client.Data.ValidationAttributes
 {
     public class TrueFalseBoolAttribute : ValidationAttribute
     {
-        public override bool IsValid(Object value)
+        public override bool IsValid(object value)
         {
             return value is bool;
         }

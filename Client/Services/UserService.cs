@@ -40,6 +40,8 @@ namespace Client.Services
         }
 
 
-
+        public async Task<HashSet<User>> GetAllUsers() {
+            return await appDBContext.Users.ToHashSetAsync();
+        }
     }
 }

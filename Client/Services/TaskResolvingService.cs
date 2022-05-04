@@ -32,7 +32,7 @@ namespace Client.Services
             var idUser = await userService.GetUserId();
             var data = await appDBContext.SubSkillTaskResolvings.AsAsyncEnumerable()
                         .FirstOrDefaultAsync(r => r.CompetitorId == idUser &
-                                            (int) r.Status < 3 &
+                                            (int)r.Status < 3 &
                                             r.SubSkillTask == subSkillTask);
             return data;
         }
@@ -53,7 +53,30 @@ namespace Client.Services
             }
         }
 
-  
+        public async Task<bool> AppointingTask(HashSet<SubSkillTask> subSkillTasks, HashSet<int> competitorsId, int appointingUserId)
+        {
+            try
+            {
+                var tasks = new HashSet<Task>();
+                foreach (var subSkillTask in subSkillTasks)
+                {
+                    foreach (var competitorId in competitorsId)
+                    {
+                        
+                        tasks.Add(Task.Run(() => appDBContext.SubSkillTaskResolvings.AddAsync(new SubSkillTaskResolving(subSkillTask, competitorId, appointingUserId))));
+                    }
+                }
+                Task.WaitAll(tasks.ToArray());
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+
         public async Task<bool> SaveChanges()
         {
             try
@@ -69,6 +92,6 @@ namespace Client.Services
         }
 
 
-        
+
     }
 }

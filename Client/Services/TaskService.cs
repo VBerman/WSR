@@ -67,5 +67,10 @@ namespace Client.Services
                 return false;
             }
         }
+
+        public async Task<HashSet<SubSkillTask>> GetAllSubSkillTasks()
+        {
+            return await appDBContext.SubSkillTasks.ToHashSetAsync();
+        }
     }
 }

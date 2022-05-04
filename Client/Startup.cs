@@ -55,6 +55,7 @@ namespace Client
             services.AddScoped<IAuthService, AuthService>();
             //services
             services.AddScoped<WSOSService>();
+            services.AddScoped<RefreshService>();
             services.AddScoped<UserService>();
             services.AddScoped<TaskService>();
             services.AddScoped<SubSkillService>();

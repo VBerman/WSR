@@ -39,7 +39,9 @@ namespace Client.Data.DTO
 
 
 
-        private ResolvingStatus status { get; set; }
+#pragma warning disable IDE1006 // Naming Styles
+        private ResolvingStatus status;
+#pragma warning restore IDE1006 // Naming Styles
 
         public ResolvingStatus Status
         {

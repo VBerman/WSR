@@ -12,7 +12,7 @@
 @inject ISnackbar Snackbar
 @inject IJSRuntime JS
 @inject IMapper Mapper
-
+@inject RefreshService RefreshService 
 @if (SubSkillTask != null)
 {
     <h1> @SubSkillTask.Name Task</h1>
@@ -135,7 +135,7 @@
                                 }
 
                             }
-                            <ControlTaskResolving SubSkillTask="@SubSkillTask" TaskResolving="@TaskResolving" NeedViewResolving="true" />
+                            <ControlTaskResolving @bind-TaskResolving="@TaskResolving" SubSkillTask="@SubSkillTask" NeedViewResolving="true" />
                         }
                         else
                         {
@@ -165,9 +165,9 @@ else
 @code {
     [Parameter] public int TaskId { get; set; }
     [Parameter] public int SubSkillId { get; set; }
-    public SubSkillTaskResolving? TaskResolving { get; set; }
+    public SubSkillTaskResolving TaskResolving { get; set; }
     public bool IsFullResolving { get; set; }
-    public SubSkillTask? SubSkillTask { get; set; }
+    public SubSkillTask SubSkillTask { get; set; }
     public bool IsReadOnly { get; set; }
     public IEnumerable<SubSkill> SubSkills { get; set; }
     public EditForm sad;

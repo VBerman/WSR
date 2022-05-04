@@ -81,7 +81,7 @@
         var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
         var dialog = DialogService.Show<Dialogs.CriterionAddEdit>($"Edit criterion", parameters, options);
         var result = await dialog.Result;
-        InvokeAsync(StateHasChanged);
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private async Task AddCriterion()
@@ -91,7 +91,7 @@
         var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
         var dialog = DialogService.Show<Dialogs.CriterionAddEdit>($"Edit criterion", parameters, options);
         var result = await dialog.Result;
-        InvokeAsync(StateHasChanged);
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private async Task DeleteCriterion(SubSkillCriterion subSkillCriterion)

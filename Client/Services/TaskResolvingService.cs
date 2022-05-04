@@ -20,14 +20,14 @@ namespace Client.Services
             this.appDBContext = appDBContext;
             this.userService = userService;
         }
-        public async Task<SubSkillTaskResolving?> GetResolvingTask(int id)
+        public async Task<SubSkillTaskResolving> GetResolvingTask(int id)
         {
             var data = await appDBContext.SubSkillTaskResolvings.Include(s => s.SubSkillTask).Include(s => s.Competitor).FirstOrDefaultAsync(s => s.Id == id);
             return data;
         }
 
 
-        public async Task<SubSkillTaskResolving?> CurrentResolvingTask(SubSkillTask subSkillTask)
+        public async Task<SubSkillTaskResolving> CurrentResolvingTask(SubSkillTask subSkillTask)
         {
             var idUser = await userService.GetUserId();
             var data = await appDBContext.SubSkillTaskResolvings.AsAsyncEnumerable()

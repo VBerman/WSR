@@ -12,16 +12,12 @@ namespace Client.Services
     public class TaskService
     {
         private readonly DB appDBContext;
-        private readonly AuthenticationStateProvider apiAuthenticationStateProvider;
-
-
-        public TaskService(DB appDBContext, AuthenticationStateProvider apiAuthenticationStateProvider)
+        public TaskService(DB appDBContext)
         {
             this.appDBContext = appDBContext;
-            this.apiAuthenticationStateProvider = apiAuthenticationStateProvider;
         }
 
-        public async Task<SubSkillTask?> GetSubSkillTask(int id)
+        public async Task<SubSkillTask> GetSubSkillTask(int id)
         {
            
             var data = await appDBContext.SubSkillTasks.Include(s => s.Author).Include(s => s.SubSkill).FirstOrDefaultAsync(s => s.Id == id);

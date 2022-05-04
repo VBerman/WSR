@@ -77,9 +77,9 @@
 
 @code {
 
-    private TreeItem? selectedValue;
+    private TreeItem selectedValue;
 
-    public TreeItem? SelectedValue
+    public TreeItem SelectedValue
     {
         get { return selectedValue; }
         set
@@ -94,15 +94,15 @@
         }
     }
 
-    private SubSkill? selectedSubskill;
+    private SubSkill selectedSubskill;
 
-    public SubSkill? SelectedSubskill
+    public SubSkill SelectedSubskill
     {
         get { return selectedSubskill; }
         set
         {
             selectedSubskill = value;
-            InvokeAsync(StateHasChanged);
+            _ = InvokeAsync(StateHasChanged);
         }
     }
 
@@ -123,7 +123,8 @@
         var options = new DialogOptions() { };
         var dialog = DialogService.Show<Dialogs.TreeCRUD>("Edit tree", parameters, options);
         var result = await dialog.Result;
-        RefreshTree();
+        _ = InvokeAsync(StateHasChanged);
+
     }
 
     private async Task RefreshTree()
@@ -131,7 +132,7 @@
 
         TreeItems.Clear();
         TreeItems = await WSOSService.GetWSOSWithoutNestingAsync();
-        InvokeAsync(StateHasChanged);
+        _ = InvokeAsync(StateHasChanged);
 
     }
 

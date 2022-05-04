@@ -43,9 +43,9 @@
 
     [Inject] public IDialogService DialogService { get; set; }
 
-    private TreeItem? selectedValue;
+    private TreeItem selectedValue;
 
-    public TreeItem? SelectedValue
+    public TreeItem SelectedValue
     {
         get { return selectedValue; }
         set
@@ -61,9 +61,9 @@
         }
     }
 
-    private SubSkill? selectedSubskill;
+    private SubSkill selectedSubskill;
 
-    public SubSkill? SelectedSubskill
+    public SubSkill SelectedSubskill
     {
         get { return selectedSubskill; }
         set
@@ -96,7 +96,7 @@
             {
                 result = await WSOSService.RecursionDeleteWSOS(SelectedValue.Id);
                 Snackbar.Report(result, "deleted 1 WSOS and {quantityChild} subskill/s.");
-                InvokeAsync(RefreshTree);
+                _ = InvokeAsync(StateHasChanged);
             }
         }
         else
@@ -111,7 +111,7 @@
                 if (result == true)
                 {
                     Snackbar.Add($"Successfully deleted {quantityChild} subskill/s.", Severity.Success);
-                    InvokeAsync(RefreshTree);
+                    _ = InvokeAsync(StateHasChanged);
 
                 }
                 else { Snackbar.Add($"Error deleted {quantityChild} subskill/s.", Severity.Error); }
@@ -127,7 +127,7 @@
         // TODO: it's like a magic
         TreeItems.Clear();
         TreeItems = await WSOSService.GetWSOSWithoutNestingAsync();
-        InvokeAsync(StateHasChanged);
+        _ = InvokeAsync(StateHasChanged);
 
     }
 
@@ -141,7 +141,7 @@
             var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
             var dialog = DialogService.Show<Dialogs.WSOSAddEdit>($"Add new WSOS", parameters, options);
             var result = await dialog.Result;
-            RefreshTree();
+            _ = InvokeAsync(RefreshTree);;
 
         }
         else
@@ -164,7 +164,7 @@
             var result = await dialog.Result;
             if (!result.Cancelled)
             {
-                InvokeAsync(RefreshTree);
+                _ = InvokeAsync(StateHasChanged);
             }
         }
 
@@ -186,7 +186,7 @@
             if (!result.Cancelled)
             {
 
-                RefreshTree();
+                _ = InvokeAsync(RefreshTree);
             }
         }
         else
@@ -199,7 +199,7 @@
             if (!result.Cancelled)
             {
 
-                RefreshTree();
+                _ = InvokeAsync(RefreshTree);;
             }
         }
     }
@@ -227,7 +227,7 @@
             if (result)
             {
                 Snackbar.Add($"Successfully move subskill/s.", Severity.Success);
-                RefreshTree();
+                _ = InvokeAsync(RefreshTree);;
 
             }
             else
@@ -248,7 +248,7 @@
             if (result)
             {
                 Snackbar.Add($"Successfully move subskill/s.", Severity.Success);
-                RefreshTree();
+                _ = InvokeAsync(RefreshTree);;
 
             }
             else

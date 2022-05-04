@@ -5,21 +5,19 @@
 @inject IMapper Mapper
 @inject TaskResolvingService TaskResolvingService
 @inject UserService UserService
-
+@inject RefreshService RefreshService
 
 @switch (TaskResolving?.Status)
 {
     case null:
         <MudItem md="12" Class="@("d-flex justify-content-" + Orientation)">
-            <MudBlazor.MudButton OnClick="AppointingTask" Color="Color.Primary" Variant="Variant.Filled">Добавить в список задач</MudBlazor.MudButton>
+            <MudBlazor.MudButton OnClick="@AppointingTask" Color="Color.Primary" Variant="Variant.Filled">Добавить в список задач</MudBlazor.MudButton>
         </MudItem>
-
         break;
     case Data.Enums.ResolvingStatus.Appointed:
         <MudItem md="12" Class="@("d-flex justify-content-" + Orientation)">
             <MudBlazor.MudButton OnClick="ReadingTask" Color="Color.Primary" Variant="Variant.Filled">Начать прочтение</MudBlazor.MudButton>
         </MudItem>
-
         break;
     case Data.Enums.ResolvingStatus.Reading:
         <MudItem md="12">
@@ -52,17 +50,32 @@
 
 @if (TaskResolving != null & NeedViewResolving)
 {
-    <MudItem md="12" Class="d-flex align-center justify-center mud-width-full">
+    if ((int)TaskResolving.Status < 3)
+    {
 
-        <MudLink Href="@($"resolvingTasks/" + TaskResolving.Id.ToString())" Color="Color.Primary">View resolving</MudLink>
-    </MudItem>
+        <MudItem md="12" Class="d-flex align-center justify-center mud-width-full">
+
+            <MudLink Href="@($"resolvingTasks/" + TaskResolving.Id.ToString())" Color="Color.Primary">View resolving</MudLink>
+        </MudItem>
+    }
 }
 
 
 @code {
-    [Parameter] public SubSkillTask? SubSkillTask { get; set; }
-
-    [Parameter] public SubSkillTaskResolving? TaskResolving { get; set; }
+    [Parameter] public SubSkillTask SubSkillTask { get; set; }
+    private SubSkillTaskResolving taskResolving;
+    [Parameter]
+    public SubSkillTaskResolving TaskResolving
+    {
+        get => taskResolving;
+        set {
+            if (taskResolving == value) return;
+            taskResolving = value;
+            TaskResolvingChanged.InvokeAsync(value);
+        }
+    }
+    [Parameter]
+    public EventCallback<SubSkillTaskResolving> TaskResolvingChanged { get; set; }
 
     [Parameter] public bool NeedViewResolving { get; set; } = false;
 
@@ -71,13 +84,15 @@
     {
         var userId = await UserService.GetUserId();
         TaskResolving = await TaskResolvingService.AppointingTask(SubSkillTask, userId, userId);
+
+
     }
     private async Task ReadingTask()
     {
         TaskResolving.Status = Data.Enums.ResolvingStatus.Reading;
 
         var result = await TaskResolvingService.SaveChanges();
-
+        _ = TaskResolvingChanged.InvokeAsync(taskResolving);
     }
 
 
@@ -86,7 +101,8 @@
     {
         TaskResolving.Status = Data.Enums.ResolvingStatus.Solving;
         var result = await TaskResolvingService.SaveChanges();
-        StateHasChanged();
+        _ = TaskResolvingChanged.InvokeAsync(taskResolving);
+
 
     }
 
@@ -94,6 +110,12 @@
     {
         TaskResolving.Status = Data.Enums.ResolvingStatus.Solved;
         var result = await TaskResolvingService.SaveChanges();
+        if (NeedViewResolving)
+        {
+            TaskResolving = null;
+        }
+        _ = TaskResolvingChanged.InvokeAsync(taskResolving);
+
     }
 
 }

@@ -5,7 +5,7 @@
 @inject TaskService TaskService
 @inject TaskResolvingService TaskResolvingService
 
-
+@inject RefreshService RefreshService 
 
 
 @if (TaskResolving != null)
@@ -79,7 +79,7 @@
                     </MudItem>
                 }
 
-                <ControlTaskResolving TaskResolving="@TaskResolving" Orientation="end" />
+                <ControlTaskResolving @bind-TaskResolving="TaskResolving" Orientation="end" />
             </MudGrid>
         </MudItem>
 
@@ -109,15 +109,14 @@ else
 @code {
     [Parameter] public int TaskResolvingId { get; set; }
 
-    public SubSkillTaskResolving? TaskResolving { get; set; }
+    public SubSkillTaskResolving TaskResolving { get; set; }
 
 
     protected override async Task OnInitializedAsync()
     {
 
         TaskResolving = await Task.Run(() => TaskResolvingService.GetResolvingTask(TaskResolvingId));
-
-
+        RefreshService.RefreshRequested += (() => _ = InvokeAsync(StateHasChanged));
     }
 
 

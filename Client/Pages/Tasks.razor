@@ -5,7 +5,6 @@
 @using Data.Model
 @using Extensions
 @using AutoMapper
-@using Data.DTO
 @inject TaskService TaskService
 @inject TaskResolvingService TaskResolvingService
 @inject UserService UserService
@@ -125,56 +124,18 @@
                         </MudItem>
                         @if (IsReadOnly)
                         {
-                            @switch (TaskResolving?.Status)
+                            if (TaskResolving != null)
                             {
-                                case null:
-                                    <MudItem md="12" Class="d-flex justify-content-center">
-                                        <MudBlazor.MudButton OnClick="AppointingTask" Color="Color.Primary" Variant="Variant.Filled">Добавить в список задач</MudBlazor.MudButton>
-                                    </MudItem>
-
-                                    break;
-                                case Data.Enums.ResolvingStatus.Appointed:
-                                    <MudItem md="12" Class="d-flex justify-content-center">
-                                        <MudBlazor.MudButton OnClick="ReadingTask" Color="Color.Primary" Variant="Variant.Filled">Начать прочтение</MudBlazor.MudButton>
-                                    </MudItem>
-
-                                    break;
-                                case Data.Enums.ResolvingStatus.Reading:
+                                if (TaskResolving.Status == Data.Enums.ResolvingStatus.Solving)
+                                {
                                     <MudItem md="12">
-                                        <EditForm @ref="sad" Context="TaskResolvingContext" Model="Mapper.Map<ReadingTaskResolvingDto>(TaskResolving)" OnValidSubmit="StartResolving">
-                                            <DataAnnotationsValidator />
-                                            <ValidationSummary />
-                                            <MudGrid>
-                                                <MudItem md="12">
-                                                    <MudCheckBox @bind-Checked="@TaskResolving.IsFullResolving" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Medium" Color="Color.Primary"></MudCheckBox>
-                                                </MudItem>
-                                                <MudItem md="12" Class="d-flex justify-content-center">
-                                                    <MudBlazor.MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Start resolving</MudBlazor.MudButton>
-                                                </MudItem>
-                                            </MudGrid>
-
-                                        </EditForm>
+                                        <MudCheckBox @bind-Checked="@TaskResolving.IsFullResolving" Disabled="true" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Medium" Color="Color.Primary"></MudCheckBox>
                                     </MudItem>
 
-                                    break;
+                                }
 
-
-                                case Data.Enums.ResolvingStatus.Solving:
-                                    <MudItem md="12" Class="d-flex justify-content-center">
-                                        <MudBlazor.MudButton OnClick="EndResolving" Color="Color.Primary" Variant="Variant.Filled">Закончить решение</MudBlazor.MudButton>
-                                    </MudItem>
-
-                                    break;
                             }
-
-
-                            @if (TaskResolving != null)
-                            {
-                                <MudItem md="12" Class="d-flex align-center justify-center mud-width-full">
-
-                                    <MudLink Href="@($"resolvingTasks/" + TaskResolving.Id.ToString())" Color="Color.Primary">View resolving</MudLink>
-                                </MudItem>
-                            }
+                            <ControlTaskResolving SubSkillTask="@SubSkillTask" TaskResolving="@TaskResolving" NeedViewResolving="true" />
                         }
                         else
                         {
@@ -230,30 +191,6 @@ else
         return await Task.Run(() => SubSkills.Where(s => s.Name.ToLower().Contains(lowerValue)));
     }
 
-    private async Task AppointingTask()
-    {
-        var userId = await UserService.GetUserId();
-        TaskResolving = await TaskResolvingService.AppointingTask(SubSkillTask, userId, userId);
-    }
-    private async Task ReadingTask()
-    {
-        TaskResolving.Status = Data.Enums.ResolvingStatus.Reading;
-        var result = await TaskResolvingService.SaveChanges();
-    }
-
-
-
-    private async Task StartResolving()
-    {
-        TaskResolving.Status = Data.Enums.ResolvingStatus.Solving;
-        var result = await TaskResolvingService.SaveChanges();
-    }
-
-    private async Task EndResolving()
-    {
-        TaskResolving.Status = Data.Enums.ResolvingStatus.Solved;
-        var result = await TaskResolvingService.SaveChanges();
-    }
 
 
     private async Task Cancel()

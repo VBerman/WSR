@@ -1,0 +1,99 @@
+﻿@using Data.Model
+@using AutoMapper
+@using Data.DTO
+@using Services
+@inject IMapper Mapper
+@inject TaskResolvingService TaskResolvingService
+@inject UserService UserService
+
+
+@switch (TaskResolving?.Status)
+{
+    case null:
+        <MudItem md="12" Class="@("d-flex justify-content-" + Orientation)">
+            <MudBlazor.MudButton OnClick="AppointingTask" Color="Color.Primary" Variant="Variant.Filled">Добавить в список задач</MudBlazor.MudButton>
+        </MudItem>
+
+        break;
+    case Data.Enums.ResolvingStatus.Appointed:
+        <MudItem md="12" Class="@("d-flex justify-content-" + Orientation)">
+            <MudBlazor.MudButton OnClick="ReadingTask" Color="Color.Primary" Variant="Variant.Filled">Начать прочтение</MudBlazor.MudButton>
+        </MudItem>
+
+        break;
+    case Data.Enums.ResolvingStatus.Reading:
+        <MudItem md="12">
+            <EditForm Context="TaskResolvingContext" Model="Mapper.Map<ReadingTaskResolvingDto>(TaskResolving)" OnValidSubmit="StartResolving">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <MudGrid>
+                    <MudItem md="12">
+                        <MudCheckBox @bind-Checked="@TaskResolving.IsFullResolving" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Medium" Color="Color.Primary"></MudCheckBox>
+                    </MudItem>
+                    <MudItem md="12" Class="@("d-flex justify-content-" + Orientation)">
+                        <MudBlazor.MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Start resolving</MudBlazor.MudButton>
+                    </MudItem>
+                </MudGrid>
+
+            </EditForm>
+        </MudItem>
+
+        break;
+
+
+    case Data.Enums.ResolvingStatus.Solving:
+        <MudItem md="12" Class="@("d-flex justify-content-" + Orientation)">
+            <MudBlazor.MudButton OnClick="EndResolving" Color="Color.Primary" Variant="Variant.Filled">Закончить решение</MudBlazor.MudButton>
+        </MudItem>
+
+        break;
+}
+
+
+@if (TaskResolving != null & NeedViewResolving)
+{
+    <MudItem md="12" Class="d-flex align-center justify-center mud-width-full">
+
+        <MudLink Href="@($"resolvingTasks/" + TaskResolving.Id.ToString())" Color="Color.Primary">View resolving</MudLink>
+    </MudItem>
+}
+
+
+@code {
+    [Parameter] public SubSkillTask? SubSkillTask { get; set; }
+
+    [Parameter] public SubSkillTaskResolving? TaskResolving { get; set; }
+
+    [Parameter] public bool NeedViewResolving { get; set; } = false;
+
+    [Parameter] public string Orientation { get; set; } = "center";
+    private async Task AppointingTask()
+    {
+        var userId = await UserService.GetUserId();
+        TaskResolving = await TaskResolvingService.AppointingTask(SubSkillTask, userId, userId);
+    }
+    private async Task ReadingTask()
+    {
+        TaskResolving.Status = Data.Enums.ResolvingStatus.Reading;
+
+        var result = await TaskResolvingService.SaveChanges();
+
+    }
+
+
+
+    private async Task StartResolving()
+    {
+        TaskResolving.Status = Data.Enums.ResolvingStatus.Solving;
+        var result = await TaskResolvingService.SaveChanges();
+        StateHasChanged();
+
+    }
+
+    private async Task EndResolving()
+    {
+        TaskResolving.Status = Data.Enums.ResolvingStatus.Solved;
+        var result = await TaskResolvingService.SaveChanges();
+    }
+
+}

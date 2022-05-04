@@ -20,6 +20,7 @@ namespace Client.Data.Model
             UserRoles = new HashSet<UserRole>();
             UserTokens = new HashSet<UserToken>();
             UserTrainingDays = new HashSet<UserTrainingDay>();
+            SubSkillTaskAppointments = new HashSet<SubSkillTaskResolving>();
         }
 
         public int Id { get; set; }
@@ -45,5 +46,8 @@ namespace Client.Data.Model
         public virtual ICollection<UserRole> UserRoles { get; set; }
         public virtual ICollection<UserToken> UserTokens { get; set; }
         public virtual ICollection<UserTrainingDay> UserTrainingDays { get; set; }
+
+        public virtual ICollection<SubSkillTaskResolving> SubSkillTaskAppointments { get; set; }
+
     }
 }

@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject IDialogService DialogService
+
 <Microsoft.AspNetCore.Components.Authorization.CascadingAuthenticationState>
 
 
@@ -7,12 +9,22 @@
         <Authorized>
             <div class="page">
 
+
+
                 <div class="sidebar">
                     <NavMenu />
                 </div>
 
                 <div class="main">
+
                     <div class="top-row px-4">
+                        <AuthorizeView Context="AppointView" Roles="Trainer">
+
+                            <MudButton Color="Color.Primary" OnClick="AppointTask" Class="mr-5" >
+                                Appoint task
+                            </MudButton>
+                        </AuthorizeView>
+
                         <LoginDisplay />
                     </div>
 
@@ -32,6 +44,16 @@
         </NotAuthorized>
     </AuthorizeView>
 </Microsoft.AspNetCore.Components.Authorization.CascadingAuthenticationState>
-<MudThemeProvider/>
+<MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
+
+@code {
+    public async Task AppointTask()
+    {
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = DialogService.Show<Pages.Dialogs.TaskAssignment>("Task assignment", options);
+        var result = await dialog.Result;
+
+    }
+}

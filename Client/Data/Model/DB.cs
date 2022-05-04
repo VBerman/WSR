@@ -356,15 +356,7 @@ namespace Client.Data.Model
             {
                 entity.ToTable("SubSkillTaskResolving");
 
-                
-
-                entity.Property(e => e.EndTime).HasColumnType("datetime");
-
-                entity.Property(e => e.ResolvingDuration).HasColumnType("time(0)");
-
                 entity.Property(e => e.SolutionPath).HasMaxLength(100);
-
-                entity.Property(e => e.StartTime).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Competitor)
                     .WithMany(p => p.SubSkillTaskResolvings)
@@ -377,6 +369,12 @@ namespace Client.Data.Model
                     .HasForeignKey(d => d.SubSkillTaskId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_SubSkillTaskResolving_SubSkillTask");
+
+                entity.HasOne(d => d.AppointingUser)
+                    .WithMany(p => p.SubSkillTaskAppointments)
+                    .HasForeignKey(d => d.AppointingUserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SubSkillTaskResolving_AppointingUser");
             });
 
             modelBuilder.Entity<TestProject>(entity =>

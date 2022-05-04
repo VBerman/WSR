@@ -333,7 +333,6 @@ namespace Client.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Theory")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("WSOSId")
@@ -359,7 +358,7 @@ namespace Client.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("MaxMark")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -452,20 +451,29 @@ namespace Client.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("AppointedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("AppointingUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CompetitorId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("EndCheckingTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsFullResolving")
+                    b.Property<DateTime?>("EndReadingTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EndSolvingTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsFullResolving")
                         .HasColumnType("bit");
-
-                    b.Property<TimeSpan?>("ResolvingDuration")
-                        .HasColumnType("time(0)");
 
                     b.Property<byte?>("Score")
                         .HasColumnType("tinyint");
@@ -474,13 +482,24 @@ namespace Client.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime?>("StartCheckingTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("StartReadingTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("StartSolvingTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("SubSkillTaskId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppointingUserId");
 
                     b.HasIndex("CompetitorId");
 
@@ -1070,6 +1089,12 @@ namespace Client.Migrations
 
             modelBuilder.Entity("Client.Data.Model.SubSkillTaskResolving", b =>
                 {
+                    b.HasOne("Client.Data.Model.User", "AppointingUser")
+                        .WithMany("SubSkillTaskAppointments")
+                        .HasForeignKey("AppointingUserId")
+                        .HasConstraintName("FK_SubSkillTaskResolving_AppointingUser")
+                        .IsRequired();
+
                     b.HasOne("Client.Data.Model.User", "Competitor")
                         .WithMany("SubSkillTaskResolvings")
                         .HasForeignKey("CompetitorId")
@@ -1081,6 +1106,8 @@ namespace Client.Migrations
                         .HasForeignKey("SubSkillTaskId")
                         .HasConstraintName("FK_SubSkillTaskResolving_SubSkillTask")
                         .IsRequired();
+
+                    b.Navigation("AppointingUser");
 
                     b.Navigation("Competitor");
 
@@ -1363,6 +1390,8 @@ namespace Client.Migrations
                     b.Navigation("Skills");
 
                     b.Navigation("SubSkillMarks");
+
+                    b.Navigation("SubSkillTaskAppointments");
 
                     b.Navigation("SubSkillTaskResolvings");
 

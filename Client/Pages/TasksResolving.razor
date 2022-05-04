@@ -1,48 +1,48 @@
 ﻿
-@page "/resolvingtasks/{resolvingTaskId:int}"
+@page "/resolvingtasks/{taskResolvingId:int}"
 @using Services
 @using Data.Model
 @inject TaskService TaskService
 @inject TaskResolvingService TaskResolvingService
 
+@inject RefreshService RefreshService 
 
 
-
-@if (ResolvingTask != null)
+@if (TaskResolving != null)
 {
 
-    <h1 class="pb-5"> @ResolvingTask.SubSkillTask.Name Task resolving</h1>
+    <h1 class="pb-5"> @TaskResolving.SubSkillTask.Name Task resolving</h1>
     <MudGrid>
 
         <MudItem md="4">
             <MudGrid>
                 <MudItem md="12">
                     <MudField Label="Competitor" Variant="Variant.Text">
-                        <MudLink Underline="Underline.None" Href="#">@ResolvingTask.Competitor.Login</MudLink>
+                        <MudLink Underline="Underline.None" Href="#">@TaskResolving.Competitor.Login</MudLink>
                     </MudField>
 
                 </MudItem>
                 <MudItem md="12">
                     <MudField Label="SubSkill task" Variant="Variant.Text">
-                        <MudLink Underline="Underline.None" Href="@($"tasks/" + ResolvingTask.SubSkillTaskId)">@ResolvingTask.SubSkillTask.Name</MudLink>
+                        <MudLink Underline="Underline.None" Href="@($"tasks/" + TaskResolving.SubSkillTaskId)">@TaskResolving.SubSkillTask.Name</MudLink>
                     </MudField>
                 </MudItem>
 
                 <MudItem md="12">
                     <MudField Label="Score / Max score" Variant="Variant.Text">
-                        <MudText>@(ResolvingTask.Score.ToString() + " / " + ResolvingTask.SubSkillTask.MaxScore.ToString()) </MudText>
+                        <MudText>@(TaskResolving.Score.ToString() + " / " + TaskResolving.SubSkillTask.MaxScore.ToString()) </MudText>
                     </MudField>
                 </MudItem>
 
                 <MudItem md="12">
-                    @if (ResolvingTask.EndTime == null)
+                    @if (TaskResolving.Status != Data.Enums.ResolvingStatus.Solved)
                     {
-                        <MudTextField Label="Solution path" @bind-Value="@ResolvingTask.SolutionPath" Variant="Variant.Text" />
+                        <MudTextField Label="Solution path" @bind-Value="@TaskResolving.SolutionPath" Variant="Variant.Text" />
                     }
                     else
                     {
                         <MudField Label="Solution path" Variant="Variant.Text">
-                            <MudLink Underline="Underline.None" Href="@ResolvingTask.SolutionPath">@ResolvingTask.SolutionPath</MudLink>
+                            <MudLink Underline="Underline.None" Href="@TaskResolving.SolutionPath">@TaskResolving.SolutionPath</MudLink>
                         </MudField>
                     }
 
@@ -54,50 +54,46 @@
             <MudGrid>
                 <MudItem md="12">
                     <MudField Label="Start time" Variant="Variant.Text">
-                        <MudText>@ResolvingTask.StartTime</MudText>
+                        <MudText>@TaskResolving.StartSolvingTime</MudText>
                     </MudField>
 
                 </MudItem>
                 <MudItem md="12">
                     <MudField Label="End time" Variant="Variant.Text">
-                        <MudText>@(ResolvingTask.EndTime.HasValue ? ResolvingTask.EndTime.Value : "Don't resolved")</MudText>
+                        <MudText>@(TaskResolving.Status == Data.Enums.ResolvingStatus.Solved ?  TaskResolving.EndSolvingTime.Value : "Don't resolved")</MudText>
                     </MudField>
 
                 </MudItem>
                 <MudItem md="12">
                     <MudField Label="Resolving duration" Variant="Variant.Text">
-                        <MudText>@(ResolvingTask.ResolvingDuration.HasValue ? ResolvingTask.ResolvingDuration : "Don't resolved")</MudText>
+                        <MudText>@(TaskResolving.Status == Data.Enums.ResolvingStatus.Solved ? TaskResolving.ResolvingDuration : "Don't resolved")</MudText>
                     </MudField>
 
                 </MudItem>
 
-                <MudItem md="12">
-                    <MudCheckBox @bind-Checked="@ResolvingTask.IsFullResolving" Disabled="true" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Medium" Color="Color.Primary"></MudCheckBox>
-
-                </MudItem>
-
-
-                @if (ResolvingTask.EndTime == null)
+                @if ((int)TaskResolving.Status > 1)
                 {
-                    <MudItem md="12" Class="d-flex justify-content-end">
-                        <MudButton OnClick="EndResolving" Color="Color.Primary" Style="vertical-align: bottom" Variant="Variant.Filled">End resolving</MudButton>
-                    </MudItem>
+                    <MudItem md="12">
+                        <MudCheckBox @bind-Checked="@TaskResolving.IsFullResolving" Disabled="true" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Medium" Color="Color.Primary"></MudCheckBox>
 
+                    </MudItem>
                 }
+
+                <ControlTaskResolving @bind-TaskResolving="TaskResolving" Orientation="end" />
             </MudGrid>
         </MudItem>
-        
 
-        @if (ResolvingTask.Comment != null)
+
+        @if (TaskResolving.Comment != null)
         {
             <MudItem md="4">
                 <div class="pt-3 pl-3">
-                        <MudText>Comment</MudText>
-                        <MudPaper Style="@($"background:{ Colors.BlueGrey.Lighten5 }")" Class="mt-4 pa-3">
+                    <MudText>Comment</MudText>
+                    <MudPaper Style="@($"background:{ Colors.BlueGrey.Lighten5 }")" Class="mt-4 pa-3">
 
-                            <MudMarkdown Value="@ResolvingTask.Comment" />
-                        </MudPaper>
-                    
+                        <MudMarkdown Value="@TaskResolving.Comment" />
+                    </MudPaper>
+
                 </div>
             </MudItem>
         }
@@ -111,25 +107,19 @@ else
 
 
 @code {
-    [Parameter] public int ResolvingTaskId { get; set; }
+    [Parameter] public int TaskResolvingId { get; set; }
 
-    public SubSkillTaskResolving? ResolvingTask { get; set; }
+    public SubSkillTaskResolving TaskResolving { get; set; }
 
 
     protected override async Task OnInitializedAsync()
     {
 
-        ResolvingTask = await Task.Run(() => TaskResolvingService.GetResolvingTask(ResolvingTaskId));
-
-
+        TaskResolving = await Task.Run(() => TaskResolvingService.GetResolvingTask(TaskResolvingId));
+        RefreshService.RefreshRequested += (() => _ = InvokeAsync(StateHasChanged));
     }
 
-    private async Task EndResolving()
-    {
-        ResolvingTask = await Task.Run(() => TaskResolvingService.EndTask(ResolvingTask));
 
-
-    }
 }
 
 

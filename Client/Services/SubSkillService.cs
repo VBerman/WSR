@@ -56,7 +56,7 @@ namespace Client.Services
             }
         }
 
-        public async Task<SubSkill?> LoadSubSkillFromTreeItem(TreeItem treeItem)
+        public async Task<SubSkill> LoadSubSkillFromTreeItem(TreeItem treeItem)
         {
             if (treeItem.IsWSOS)
             {

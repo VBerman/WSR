@@ -4,13 +4,15 @@
 @using Services
 @using Data.Model
 @using Extensions
-
+@using AutoMapper
 @inject TaskService TaskService
 @inject TaskResolvingService TaskResolvingService
 @inject UserService UserService
 @inject SubSkillService SubSkillService
 @inject ISnackbar Snackbar
 @inject IJSRuntime JS
+@inject IMapper Mapper
+@inject RefreshService RefreshService 
 @if (SubSkillTask != null)
 {
     <h1> @SubSkillTask.Name Task</h1>
@@ -89,15 +91,17 @@
                                 <MudField Label="Attachment path" ReadOnly="true" Variant="Variant.Text">
                                     <MudLink Underline="Underline.None"
                                              Href="@(SubSkillTask.AttachmentPath.Contains("http://") |
-                                                         SubSkillTask.AttachmentPath.Contains("https://") ?
-                                                         SubSkillTask.AttachmentPath :
-                                                         "https://" + SubSkillTask.AttachmentPath)">@SubSkillTask.AttachmentPath</MudLink>
-                                                    </MudField>
-                                                }
-                                                else
-                                                {
-                                                    <MudTextField @bind-Value="@SubSkillTask.AttachmentPath" Label="Attachment path" For="@(() => SubSkillTask.AttachmentPath)" />
-                                                }
+                                            SubSkillTask.AttachmentPath.Contains("https://") ?
+                                            SubSkillTask.AttachmentPath :
+                                            "https://" + SubSkillTask.AttachmentPath)">
+                                        @SubSkillTask.AttachmentPath
+                                    </MudLink>
+                                </MudField>
+                            }
+                            else
+                            {
+                                <MudTextField @bind-Value="@SubSkillTask.AttachmentPath" Label="Attachment path" For="@(() => SubSkillTask.AttachmentPath)" />
+                            }
                         </MudItem>
                         <MudItem md="12">
                             @if (IsReadOnly)
@@ -120,25 +124,18 @@
                         </MudItem>
                         @if (IsReadOnly)
                         {
-
-
-
-
-                            <MudItem md="12">
-                                <MudCheckBox @bind-Checked="@IsFullResolving" Disabled="@(TaskResolving != null)" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Small" Color="Color.Primary"></MudCheckBox>
-                            </MudItem>
-
-                            <MudItem md="12" Class="d-flex justify-content-between">
-                                <MudBlazor.MudButton OnClick="StartResolving" Color="Color.Primary" Disabled="@(TaskResolving != null)" Variant="Variant.Filled">Start resolving</MudBlazor.MudButton>
-                                <MudBlazor.MudButton OnClick="EndResolving" Color="Color.Primary" Disabled="@(TaskResolving == null)" Variant="Variant.Filled">End resolving</MudBlazor.MudButton>
-                            </MudItem>
-                            @if (TaskResolving != null)
+                            if (TaskResolving != null)
                             {
-                                <MudItem md="12" Class="d-flex align-center justify-center mud-width-full">
+                                if (TaskResolving.Status == Data.Enums.ResolvingStatus.Solving)
+                                {
+                                    <MudItem md="12">
+                                        <MudCheckBox @bind-Checked="@TaskResolving.IsFullResolving" Disabled="true" Label="Full resolving" Dense="true" Class="ml-n1" Size="Size.Medium" Color="Color.Primary"></MudCheckBox>
+                                    </MudItem>
 
-                                    <MudLink Href="@($"resolvingTasks/" + TaskResolving.Id.ToString())" Color="Color.Primary">View resolving</MudLink>
-                                </MudItem>
+                                }
+
                             }
+                            <ControlTaskResolving @bind-TaskResolving="@TaskResolving" SubSkillTask="@SubSkillTask" NeedViewResolving="true" />
                         }
                         else
                         {
@@ -168,22 +165,19 @@ else
 @code {
     [Parameter] public int TaskId { get; set; }
     [Parameter] public int SubSkillId { get; set; }
-    public SubSkillTaskResolving? TaskResolving { get; set; }
+    public SubSkillTaskResolving TaskResolving { get; set; }
     public bool IsFullResolving { get; set; }
-    public SubSkillTask? SubSkillTask { get; set; }
+    public SubSkillTask SubSkillTask { get; set; }
     public bool IsReadOnly { get; set; }
     public IEnumerable<SubSkill> SubSkills { get; set; }
-
+    public EditForm sad;
     protected override async Task OnInitializedAsync()
     {
         IsReadOnly = !(await UserService.HasRole("Trainer"));
 
         await Cancel();
+
         TaskResolving = await Task.Run(() => TaskResolvingService.CurrentResolvingTask(SubSkillTask));
-        if (TaskResolving != null)
-        {
-            IsFullResolving = TaskResolving.IsFullResolving;
-        }
         SubSkills = await SubSkillService.GetAllSubSkills();
     }
 
@@ -197,17 +191,6 @@ else
         return await Task.Run(() => SubSkills.Where(s => s.Name.ToLower().Contains(lowerValue)));
     }
 
-    private async Task StartResolving()
-    {
-        TaskResolving = await Task.Run(() => TaskResolvingService.StartTask(SubSkillTask, IsFullResolving));
-    }
-
-    private async Task EndResolving()
-    {
-        await Task.Run(() => TaskResolvingService.EndTask(TaskResolving));
-        TaskResolving = null;
-
-    }
 
 
     private async Task Cancel()
@@ -224,7 +207,6 @@ else
         {
             SubSkillTask = await Task.Run(() => TaskService.GetSubSkillTask(TaskId));
         }
-        InvokeAsync(StateHasChanged);
     }
 
     private async Task SaveChanges()
@@ -241,7 +223,7 @@ else
         {
             result = await TaskService.UpdateSubSkillTask();
 
-                Snackbar.Report(result, "update task.");
+            Snackbar.Report(result, "update task.");
 
         }
 

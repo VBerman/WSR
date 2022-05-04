@@ -1,27 +1,17 @@
 ﻿using Client.Data.Enums;
-using Client.Extensions;
+using Client.Data.ValidationAttributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Threading.Tasks;
 
-#nullable disable
-
-namespace Client.Data.Model
+namespace Client.Data.DTO
 {
-    public partial class SubSkillTaskResolving
-    {
-        private SubSkillTaskResolving()
-        {
 
-        }
-        public SubSkillTaskResolving(SubSkillTask subSkillTask, int competitorId, int appointingUserId)
-        {
-            SubSkillTask = subSkillTask;
-            CompetitorId = competitorId;
-            AppointingUserId = appointingUserId;
-            Status = ResolvingStatus.Appointed;
-        }
+
+    public class ReadingTaskResolvingDto
+    {
         public int Id { get; set; }
         [Required]
         public int SubSkillTaskId { get; set; }
@@ -29,11 +19,6 @@ namespace Client.Data.Model
         public int CompetitorId { get; set; }
         [Required]
         public int AppointingUserId { get; set; }
-
-        [NotMapped]
-        public string ResolvingDuration => (EndSolvingTime - StartSolvingTime).ToCorrectString();
-
-
         public byte? Score
         { get; set; }
         public string SolutionPath { get; set; }
@@ -49,6 +34,7 @@ namespace Client.Data.Model
         public DateTime? StartCheckingTime { get; set; }
         public DateTime? EndCheckingTime { get; set; }
         public string Comment { get; set; }
+        [TrueFalseBool(ErrorMessage = "Set IsFullResolving")]
         public bool? IsFullResolving { get; set; }
 
 
@@ -56,7 +42,6 @@ namespace Client.Data.Model
 #pragma warning disable IDE1006 // Naming Styles
         private ResolvingStatus status;
 #pragma warning restore IDE1006 // Naming Styles
-
 
         public ResolvingStatus Status
         {
@@ -89,8 +74,5 @@ namespace Client.Data.Model
                 status = value;
             }
         }
-        public virtual User AppointingUser { get; set; }
-        public virtual User Competitor { get; set; }
-        public virtual SubSkillTask SubSkillTask { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
@@ -18,8 +19,9 @@ namespace Client.Data.Model
         public string Name { get; set; }
 
 
-        public string? Description { get; set; }
+        public string Description { get; set; }
         [Required]
+        [Column(TypeName = "decimal(5, 2)")]
         public decimal MaxMark { get; set; }
         public int SubSkillId { get; set; }
             

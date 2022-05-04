@@ -1,4 +1,5 @@
-﻿using Client.Data.Model;
+﻿using Client.Data.Enums;
+using Client.Data.Model;
 using Client.Providers;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -12,42 +13,85 @@ namespace Client.Services
     public class TaskResolvingService
     {
         private readonly DB appDBContext;
-        private readonly AuthenticationStateProvider apiAuthenticationStateProvider;
+        private readonly UserService userService;
 
-        public TaskResolvingService(DB appDBContext, AuthenticationStateProvider apiAuthenticationStateProvider)
+        public TaskResolvingService(DB appDBContext, UserService userService)
         {
             this.appDBContext = appDBContext;
-            this.apiAuthenticationStateProvider = apiAuthenticationStateProvider;
+            this.userService = userService;
         }
-        public async Task<SubSkillTaskResolving?> GetResolvingTask(int id)
+        public async Task<SubSkillTaskResolving> GetResolvingTask(int id)
         {
             var data = await appDBContext.SubSkillTaskResolvings.Include(s => s.SubSkillTask).Include(s => s.Competitor).FirstOrDefaultAsync(s => s.Id == id);
             return data;
         }
 
 
-        public async Task<SubSkillTaskResolving?> CurrentResolvingTask(SubSkillTask subSkillTask)
+        public async Task<SubSkillTaskResolving> CurrentResolvingTask(SubSkillTask subSkillTask)
         {
-            var idUser = int.Parse(apiAuthenticationStateProvider.GetAuthenticationStateAsync().Result.User.Claims.FirstOrDefault(c => c.Type == "Id").Value);
-            var data = await appDBContext.SubSkillTaskResolvings.AsAsyncEnumerable().FirstOrDefaultAsync(r => r.CompetitorId == idUser && r.EndTime == null && r.SubSkillTask == subSkillTask);
+            var idUser = await userService.GetUserId();
+            var data = await appDBContext.SubSkillTaskResolvings.AsAsyncEnumerable()
+                        .FirstOrDefaultAsync(r => r.CompetitorId == idUser &
+                                            (int)r.Status < 3 &
+                                            r.SubSkillTask == subSkillTask);
             return data;
         }
 
-        public async Task<SubSkillTaskResolving> StartTask(SubSkillTask subSkillTask, bool isFullResolving)
+        public async Task<SubSkillTaskResolving> AppointingTask(SubSkillTask subSkillTask, int competitorId, int appointingUserId)
         {
-            var idUser = int.Parse(apiAuthenticationStateProvider.GetAuthenticationStateAsync().Result.User.Claims.FirstOrDefault(c => c.Type == "Id").Value);
-            var newTaskResolving = await appDBContext.AddAsync(new SubSkillTaskResolving() { StartTime = DateTime.Now, SubSkillTask = subSkillTask, CompetitorId = idUser, IsFullResolving = isFullResolving, Score = 0 });
-            await appDBContext.SaveChangesAsync();
-
-            return newTaskResolving.Entity;
-
+            try
+            {
+                var newTaskResolving = await appDBContext.SubSkillTaskResolvings.AddAsync(
+                    new SubSkillTaskResolving(subSkillTask, competitorId, appointingUserId)
+                    );
+                await appDBContext.SaveChangesAsync();
+                return newTaskResolving.Entity;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
-        public async Task<SubSkillTaskResolving> EndTask(SubSkillTaskResolving taskResolving)
+
+        public async Task<bool> AppointingTask(HashSet<SubSkillTask> subSkillTasks, HashSet<int> competitorsId, int appointingUserId)
         {
-            taskResolving.EndTime = DateTime.Now;
-            taskResolving.ResolvingDuration = taskResolving.EndTime - taskResolving.StartTime;
-            await appDBContext.SaveChangesAsync();
-            return taskResolving;
+            try
+            {
+                var tasks = new HashSet<Task>();
+                foreach (var subSkillTask in subSkillTasks)
+                {
+                    foreach (var competitorId in competitorsId)
+                    {
+                        
+                        tasks.Add(Task.Run(() => appDBContext.SubSkillTaskResolvings.AddAsync(new SubSkillTaskResolving(subSkillTask, competitorId, appointingUserId))));
+                    }
+                }
+                Task.WaitAll(tasks.ToArray());
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
+
+
+        public async Task<bool> SaveChanges()
+        {
+            try
+            {
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+        }
+
+
+
     }
 }

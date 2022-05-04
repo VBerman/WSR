@@ -32,25 +32,43 @@ namespace Client.Services
             var idUser = await userService.GetUserId();
             var data = await appDBContext.SubSkillTaskResolvings.AsAsyncEnumerable()
                         .FirstOrDefaultAsync(r => r.CompetitorId == idUser &
-                                            (r.Status != ResolvingStatus.Checking | r.Status != ResolvingStatus.Checked) &
+                                            (int) r.Status < 3 &
                                             r.SubSkillTask == subSkillTask);
             return data;
         }
 
-        public async Task<SubSkillTaskResolving> StartTask(SubSkillTask subSkillTask, bool isFullResolving)
+        public async Task<SubSkillTaskResolving> AppointingTask(SubSkillTask subSkillTask, int competitorId, int appointingUserId)
         {
-            var idUser = await userService.GetUserId();
-            var newTaskResolving = await appDBContext.AddAsync(new SubSkillTaskResolving() { StartSolvingTime = DateTime.Now, SubSkillTask = subSkillTask, CompetitorId = idUser, IsFullResolving = isFullResolving, Score = 0 });
-            await appDBContext.SaveChangesAsync();
-
-            return newTaskResolving.Entity;
-
+            try
+            {
+                var newTaskResolving = await appDBContext.SubSkillTaskResolvings.AddAsync(
+                    new SubSkillTaskResolving(subSkillTask, competitorId, appointingUserId)
+                    );
+                await appDBContext.SaveChangesAsync();
+                return newTaskResolving.Entity;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
-        public async Task<SubSkillTaskResolving> EndTask(SubSkillTaskResolving taskResolving)
+
+  
+        public async Task<bool> SaveChanges()
         {
-            taskResolving.Status = ResolvingStatus.Solved;
-            await appDBContext.SaveChangesAsync();
-            return taskResolving;
+            try
+            {
+                await appDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
         }
+
+
+        
     }
 }
